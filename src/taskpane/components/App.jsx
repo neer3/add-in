@@ -15,7 +15,7 @@ import FindComponent from "./FindComponent";
 
 const useStyles = makeStyles({
   root: {
-    minHeight: "100vh",
+    maxHeight: "100vh",
   },
 });
 
@@ -28,7 +28,7 @@ const App = (props) => {
       <Header
         logo="https://www.pramata.com/wp-content/uploads/2022/12/cropped-Copy-of-pramata-logo-2000px-1.png"
         title={props.title}
-        message="Welcome"
+        message=""
       />
       <div>
         <Accordion title="Replace/Find">
