@@ -6,6 +6,7 @@ import TextInsertion from "./TextInsertion";
 import Accordion from "./Accordion";
 import { Button, makeStyles } from "@fluentui/react-components";
 import { Ribbon24Regular, LockOpen24Regular, DesignIdeas24Regular } from "@fluentui/react-icons";
+import TextExport from "./TextExport";
 
 const useStyles = makeStyles({
   root: {
@@ -54,7 +55,7 @@ const App = (props) => {
         </Accordion>
         <Accordion title="Comment">Content for Section 2</Accordion>
         <Accordion title="Accept/Reject">Content for Section 2</Accordion>
-        <Accordion title="Original/Current">Content for Section 2</Accordion>
+        <Accordion title="Export Original/Current"><TextExport/></Accordion>
     </div>
     </div>
   );
