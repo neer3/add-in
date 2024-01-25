@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { Button, Field, Textarea, tokens, makeStyles } from "@fluentui/react-components";
-import insertText from "../office-document";
+import './Modal.css';
 
 const useStyles = makeStyles({
   instructions: {
@@ -23,58 +23,74 @@ const useStyles = makeStyles({
   },
   button: {
     marginTop: "5px",
-  }
+  },
 });
 
 const TextExport = () => {
-    const [text, setText] = useState("Some text.");
+  const [text, setText] = useState("Some text.");
+  const [isOpen, setIsOpen] = useState(false);
 
-    const handleTextRead = async () => {
-      
-      await Word.run(async (context) => {
-        const body = context.document.body;
+  const openModal = () => {
+    setIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+  };
+
+  const handleTextRead = async () => {
+    await Word.run(async (context) => {
+      const body = context.document.body;
       body.load("text");
-  
-      await context.sync();
-        setText(body.text);
-      });
-    };
-  
-    const handleTextReadWithoutChange = async ()=>{
-      await Word.run(async (context) => {
-        const body = context.document.body;
-  
-        body.load("text");
-  
-        await context.sync();
-  
-        var a = body.getReviewedText(Word.ChangeTrackingVersion.original);
-  
-        await context.sync();
-  
-        setText(a.value)
-  
-      });
-    }
 
-  const handleTextChange = async (event) => {
-    setText(event.target.value);
+      await context.sync();
+      setText(body.text);
+      setIsOpen(true);
+    });
+  };
+
+  const handleTextReadWithoutChange = async () => {
+    await Word.run(async (context) => {
+      const body = context.document.body;
+
+      body.load("text");
+
+      await context.sync();
+
+      var a = body.getReviewedText(Word.ChangeTrackingVersion.original);
+
+      await context.sync();
+
+      setText(a.value);
+      setIsOpen(true);
+    });
   };
 
   const styles = useStyles();
 
   return (
     <div className={styles.textPromptAndInsertion}>
-        The word document can Exported at the end.
-        <Button className={styles.button} appearance="primary" disabled={false} size="large" onClick={handleTextRead}>
-        Read text content
+      <h5>The word document can Exported at the end.</h5>
+      <Button className={styles.button} appearance="primary" disabled={false} size="large" onClick={handleTextRead}>
+        Current Content
       </Button>
-      <Button className={styles.button} appearance="primary" disabled={false} size="large" onClick={handleTextReadWithoutChange}>
-        Read text content without change
+      <Button
+        className={styles.button}
+        appearance="primary"
+        disabled={false}
+        size="large"
+        onClick={handleTextReadWithoutChange}
+      >
+        Original Content
       </Button>
-      <Field className={styles.textAreaField} size="large" label="Enter text to be inserted into the document.">
-        <Textarea size="large" value={text} onChange={handleTextChange} />
-      </Field>
+      {isOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <button className="close-button" onClick={closeModal}>X</button>
+            {text}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
