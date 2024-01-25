@@ -8,6 +8,7 @@ import Accordion from "./Accordion";
 import { Button, makeStyles } from "@fluentui/react-components";
 import { Ribbon24Regular, LockOpen24Regular, DesignIdeas24Regular } from "@fluentui/react-icons";
 import TextExport from "./TextExport";
+import ApprovalComponent from "./ApprovalComponent";
 
 const useStyles = makeStyles({
   root: {
@@ -46,9 +47,16 @@ const App = (props) => {
             <Comment/>
           </div>
         </Accordion>
-        <Accordion title="Accept/Reject">Content for Section 2</Accordion>
-        <Accordion title="Export Original/Current"><TextExport/></Accordion>
-    </div>
+        <Accordion title="Accept/Reject">
+          <div>
+            <h5>Confirming the red lined changes</h5>
+          </div>
+          <div>
+            <ApprovalComponent/>
+          </div>
+        </Accordion>
+        <Accordion title="Original/Current">Content for Section 2</Accordion>
+      </div>
     </div>
   );
 };
