@@ -62,7 +62,7 @@ const App = (props) => {
             <ApprovalComponent/>
           </div>
         </Accordion>
-        <Accordion title="Original/Current">Content for Section 2</Accordion>
+        <Accordion title="Original/Current"><TextExport/></Accordion>
       </div>
     </div>
   );
