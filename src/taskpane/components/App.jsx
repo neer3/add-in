@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import Header from "./Header";
 import HeroList from "./HeroList";
 import TextInsertion from "./TextInsertion";
+import Accordion from "./Accordion";
 import { makeStyles } from "@fluentui/react-components";
 import { Ribbon24Regular, LockOpen24Regular, DesignIdeas24Regular } from "@fluentui/react-icons";
 
@@ -36,6 +37,14 @@ const App = (props) => {
       <Header logo="assets/logo-filled.png" title={props.title} message="Welcome" />
       <HeroList message="Discover what this add-in can do for you today!" items={listItems} />
       <TextInsertion />
+      <div>
+      <Accordion title="Section 1">
+        Content for Section 1
+      </Accordion>
+      <Accordion title="Section 2">
+        Content for Section 2
+      </Accordion>
+    </div>
     </div>
   );
 };
