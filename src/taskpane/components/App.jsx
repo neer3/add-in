@@ -4,7 +4,7 @@ import Header from "./Header";
 import HeroList from "./HeroList";
 import TextInsertion from "./TextInsertion";
 import Accordion from "./Accordion";
-import { makeStyles } from "@fluentui/react-components";
+import { Button, makeStyles } from "@fluentui/react-components";
 import { Ribbon24Regular, LockOpen24Regular, DesignIdeas24Regular } from "@fluentui/react-icons";
 
 const useStyles = makeStyles({
@@ -34,16 +34,27 @@ const App = (props) => {
 
   return (
     <div className={styles.root}>
-      <Header logo="assets/logo-filled.png" title={props.title} message="Welcome" />
-      <HeroList message="Discover what this add-in can do for you today!" items={listItems} />
+      <Header
+        logo="https://www.pramata.com/wp-content/uploads/2022/12/cropped-Copy-of-pramata-logo-2000px-1.png"
+        title={props.title}
+        message="Welcome"
+      />
       <TextInsertion />
       <div>
-      <Accordion title="Section 1">
-        Content for Section 1
-      </Accordion>
-      <Accordion title="Section 2">
-        Content for Section 2
-      </Accordion>
+        <Accordion title="Replace/Find">
+          <div>
+            <h5>
+              Replace or find its a straight forward functionality, here we want to display that we can acheive it via
+              the add in.
+            </h5>
+            <Accordion title="Replace">
+              <Button>Replace</Button>
+            </Accordion>
+          </div>
+        </Accordion>
+        <Accordion title="Comment">Content for Section 2</Accordion>
+        <Accordion title="Accept/Reject">Content for Section 2</Accordion>
+        <Accordion title="Original/Current">Content for Section 2</Accordion>
     </div>
     </div>
   );
