@@ -9,6 +9,7 @@ import { Button, makeStyles } from "@fluentui/react-components";
 import { Ribbon24Regular, LockOpen24Regular, DesignIdeas24Regular } from "@fluentui/react-icons";
 import TextExport from "./TextExport";
 import ApprovalComponent from "./ApprovalComponent";
+import Insert from "./Insert";
 
 const useStyles = makeStyles({
   root: {
@@ -37,6 +38,12 @@ const App = (props) => {
             <Accordion title="Replace">
               <Button>Replace</Button>
             </Accordion>
+          </div>
+        </Accordion>
+        <Accordion title="Insert">
+          <div>
+            <h5>Inserting any text/paragraph in 3 different modes start, end and in middle.</h5>
+            <Insert/>
           </div>
         </Accordion>
         <Accordion title="Comment">
