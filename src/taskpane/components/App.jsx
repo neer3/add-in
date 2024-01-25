@@ -47,13 +47,13 @@ const App = (props) => {
         </Accordion>
         <Accordion title="Insert">
           <div>
-            <h5>Inserting any text/paragraph in 3 different modes start, end and in middle.</h5>
+            <h5>Inserting any text/paragraph can be in 3 different modes start, end and in middle.</h5>
             <Insert/>
           </div>
         </Accordion>
         <Accordion title="Comment">
           <div>
-            <h5>Comment can be added to a string/text or a paragraph</h5>
+            <h5>Comment can be added to a selection of text even by matching string/text or a paragraph. </h5>
           </div>
           <div>
             <Comment/>
@@ -61,14 +61,15 @@ const App = (props) => {
         </Accordion>
         <Accordion title="Accept/Reject">
           <div>
-            <h5>Confirming the red lined changes</h5>
+            <h5>User have option to confirming the red lined changes. Once it comfirmed it will be added to the original document.</h5>
           </div>
           <div>
             <ApprovalComponent/>
           </div>
         </Accordion>
         <Accordion title="Original/Current">
-          <TextExport/>
+          <div><h5>The word document can Exported at the end. Have option to export with or without red lined changes.</h5></div>
+          <div><TextExport/></div>
         </Accordion>
       </div>
     </div>

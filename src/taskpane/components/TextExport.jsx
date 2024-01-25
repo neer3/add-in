@@ -70,7 +70,6 @@ const TextExport = () => {
 
   return (
     <div className={styles.textPromptAndInsertion}>
-      <h5>The word document can Exported at the end.</h5>
       <Button className={styles.button} appearance="primary" disabled={false} size="large" onClick={handleTextRead}>
         Current Content
       </Button>
