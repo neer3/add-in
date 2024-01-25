@@ -1,0 +1,57 @@
+/* CommentForm.css */
+
+.comment-form {
+  font-family: Arial, sans-serif;
+  width: 300px;
+  margin: 20px auto;
+}
+
+.select-wrapper {
+  margin-bottom: 10px;
+}
+
+.select-wrapper select {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+}
+
+.input-wrapper {
+  margin-bottom: 10px;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+}
+
+.toggle-button {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.toggle-button:hover {
+  background-color: #45a049;
+}
+
+.add-comment-button {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  background-color: #008CBA;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.add-comment-button:hover {
+  background-color: #0077A8;
+}
