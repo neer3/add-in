@@ -21,15 +21,41 @@ const useStyles = makeStyles({
     marginRight: "20px",
     maxWidth: "50%",
   },
+  button: {
+    marginTop: "5px",
+  }
 });
 
 const TextExport = () => {
-  const [text, setText] = useState("Some text.");
+    const [text, setText] = useState("Some text.");
 
-  const handleTextInsertion = async () => {
-    
-    await insertText(text);
-  };
+    const handleTextRead = async () => {
+      
+      await Word.run(async (context) => {
+        const body = context.document.body;
+      body.load("text");
+  
+      await context.sync();
+        setText(body.text);
+      });
+    };
+  
+    const handleTextReadWithoutChange = async ()=>{
+      await Word.run(async (context) => {
+        const body = context.document.body;
+  
+        body.load("text");
+  
+        await context.sync();
+  
+        var a = body.getReviewedText(Word.ChangeTrackingVersion.original);
+  
+        await context.sync();
+  
+        setText(a.value)
+  
+      });
+    }
 
   const handleTextChange = async (event) => {
     setText(event.target.value);
@@ -40,13 +66,15 @@ const TextExport = () => {
   return (
     <div className={styles.textPromptAndInsertion}>
         The word document can Exported at the end.
+        <Button className={styles.button} appearance="primary" disabled={false} size="large" onClick={handleTextRead}>
+        Read text content
+      </Button>
+      <Button className={styles.button} appearance="primary" disabled={false} size="large" onClick={handleTextReadWithoutChange}>
+        Read text content without change
+      </Button>
       <Field className={styles.textAreaField} size="large" label="Enter text to be inserted into the document.">
         <Textarea size="large" value={text} onChange={handleTextChange} />
       </Field>
-      <Field className={styles.instructions}>Click the button to insert text.</Field>
-      <Button appearance="primary" disabled={false} size="large" onClick={handleTextInsertion}>
-        Insert text
-      </Button>
     </div>
   );
 };
