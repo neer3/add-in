@@ -10,6 +10,8 @@ import { Ribbon24Regular, LockOpen24Regular, DesignIdeas24Regular } from "@fluen
 import TextExport from "./TextExport";
 import ApprovalComponent from "./ApprovalComponent";
 import Insert from "./Insert";
+import ReplaceComponent from "./ReplaceComponent";
+import FindComponent from "./FindComponent";
 
 const useStyles = makeStyles({
   root: {
@@ -36,7 +38,10 @@ const App = (props) => {
               the add in.
             </h5>
             <Accordion title="Replace">
-              <Button>Replace</Button>
+              <ReplaceComponent/>
+            </Accordion>
+            <Accordion title="Find">
+              <FindComponent/>
             </Accordion>
           </div>
         </Accordion>
