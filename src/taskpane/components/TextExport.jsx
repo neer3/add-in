@@ -86,7 +86,7 @@ const TextExport = () => {
         <div className="modal-overlay">
           <div className="modal-content">
             <button className="close-button" onClick={closeModal}>X</button>
-            {text}
+            {text.substring(0, 400)}
           </div>
         </div>
       )}
