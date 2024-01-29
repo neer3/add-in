@@ -122,6 +122,7 @@ const ApprovalComponent = () => {
             <div className="button-container">
               <button className="approve-button" onClick={approveEntry}>Approve</button>
               <button className="reject-button" onClick={rejectEntry}>Reject</button>
+              <button className="next-button" onClick={moveToNextEntry}>Next</button>
             </div>
           </div>
         )}
