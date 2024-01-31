@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import Header from "./Header";
 import HeroList from "./HeroList";
@@ -12,8 +12,9 @@ import ApprovalComponent from "./ApprovalComponent";
 import Insert from "./Insert";
 import ReplaceComponent from "./ReplaceComponent";
 import FindComponent from "./FindComponent";
-import GenAi from "./GenAi";
+// import GenAi from "./GenAi";
 import Gamma from "./Gamma";
+import AuthPage from "./Auth";
 
 const useStyles = makeStyles({
   root: {
@@ -25,6 +26,18 @@ const App = (props) => {
   const styles = useStyles();
   // The list items are static and won't change at runtime,
   // so this should be an ordinary const, not a part of state.
+  const [authenticated, setAuthenticated] = useState(false);
+
+  const authenticate = () => {
+    // Perform authentication logic (e.g., making API calls)
+    // Set authenticated to true if authentication is successful
+    setAuthenticated(true);
+  };
+
+  if (!authenticated) {
+    // Render the AuthPage component if not authenticated
+    return <AuthPage onAuthenticate={authenticate} />;
+  }
   return (
     <div className={styles.root}>
       <Header
@@ -73,9 +86,9 @@ const App = (props) => {
           <div><h5>The word document can Exported at the end. Have option to export with or without red lined changes.</h5></div>
           <div><TextExport/></div>
         </Accordion>
-        <Accordion title="GenAI">
+        {/* <Accordion title="GenAI">
           <GenAi/>
-        </Accordion>
+        </Accordion> */}
         <Accordion title="Gamma">
           <Gamma/>
         </Accordion>
