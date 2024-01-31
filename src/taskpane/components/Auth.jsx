@@ -4,20 +4,6 @@ import './Auth.css'
 import Header from "./Header";
 
 const AuthPage = ({ onAuthenticate }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-
-//   const handleLogin = () => {
-//     // Here, you would typically perform authentication logic,
-//     // such as making API calls to validate the username and password.
-//     // For simplicity, I'll just check if the username and password match "admin".
-//     if (username === "admin" && password === "admin") {
-//       // Call the onAuthenticate callback to notify the parent component that authentication is successful.
-//       onAuthenticate();
-//     } else {
-//       alert("Invalid username or password");
-//     }
-//   };
   const handleLogin = async() => {
     await Word.run(async (context) => {
       Office.context.ui.displayDialogAsync('https://localhost:3000/login.html', {height: 30, width: 20}, (asyncResult) => {

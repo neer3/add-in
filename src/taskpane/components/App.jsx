@@ -24,18 +24,13 @@ const useStyles = makeStyles({
 
 const App = (props) => {
   const styles = useStyles();
-  // The list items are static and won't change at runtime,
-  // so this should be an ordinary const, not a part of state.
   const [authenticated, setAuthenticated] = useState(false);
 
   const authenticate = () => {
-    // Perform authentication logic (e.g., making API calls)
-    // Set authenticated to true if authentication is successful
     setAuthenticated(true);
   };
 
   if (!authenticated) {
-    // Render the AuthPage component if not authenticated
     return <AuthPage onAuthenticate={authenticate} />;
   }
   return (
