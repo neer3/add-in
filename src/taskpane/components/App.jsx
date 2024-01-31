@@ -5,7 +5,7 @@ import HeroList from "./HeroList";
 import TextInsertion from "./TextInsertion";
 import Comment from "./Comment";
 import Accordion from "./Accordion";
-import { Button, makeStyles } from "@fluentui/react-components";
+import { Button, makeStyles, tokens } from "@fluentui/react-components";
 import { Ribbon24Regular, LockOpen24Regular, DesignIdeas24Regular } from "@fluentui/react-icons";
 import TextExport from "./TextExport";
 import ApprovalComponent from "./ApprovalComponent";
@@ -26,8 +26,28 @@ const App = (props) => {
   const styles = useStyles();
   const [authenticated, setAuthenticated] = useState(false);
 
+  const clearCookies = () => {
+    const cookies = document.cookie.split(';');
+  
+    cookies.forEach(cookie => {
+      const cookieParts = cookie.split('=');
+      const cookieName = cookieParts[0].trim();
+      document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+    });
+  };
+
   const authenticate = () => {
-    setAuthenticated(true);
+    const cookies = document.cookie;
+    const jwtToken = cookies.split(';').find(cookie => cookie.trim().startsWith('pramata_add_in_jwt_token='));
+    const token = jwtToken.split('=')
+    console.log(token[1])
+    // clearCookies()
+    if (token[1]=='Admin123') {
+      setAuthenticated(true);
+    } else {
+      setAuthenticated(false);
+      console.log('Authentication failed!');
+    }
   };
 
   if (!authenticated) {
