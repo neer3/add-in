@@ -41,7 +41,7 @@ const Insert = () => {
   const handleSecondInputChange = (e) => {
     let value = e.target.value;
     value = value.replace(/^0+/, '').replace(/\D/g, '');
-    value = Math.min(Math.max(value, 0), 4);
+    value = Math.min(Math.max(value, 0), 10);
 
     setSecondInputValue(value);
   };

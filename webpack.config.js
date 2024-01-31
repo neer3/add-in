@@ -22,6 +22,8 @@ module.exports = async (env, options) => {
       vendor: ["react", "react-dom", "core-js", "@fluentui/react-components", "@fluentui/react-icons"],
       taskpane: ["./src/taskpane/index.jsx", "./src/taskpane/taskpane.html"],
       commands: "./src/commands/commands.js",
+      login: ["./src/login/index.jsx", "./src/login/login.html"],
+      loggedin: ["./src/loggedin/index.jsx", "./src/loggedin/loggedin.html"],
     },
     output: {
       clean: true,
@@ -98,6 +100,16 @@ module.exports = async (env, options) => {
         filename: "commands.html",
         template: "./src/commands/commands.html",
         chunks: ["commands"],
+      }),
+      new HtmlWebpackPlugin({
+        filename: "login.html",
+        template: "./src/login/login.html",
+        chunks: ["login"],
+      }),
+      new HtmlWebpackPlugin({
+        filename: "loggedin.html",
+        template: "./src/loggedin/loggedin.html",
+        chunks: ["loggedin"],
       }),
       new webpack.ProvidePlugin({
         Promise: ["es6-promise", "Promise"],
