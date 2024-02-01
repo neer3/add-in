@@ -12,8 +12,8 @@ const App = () => {
     }
 
     // setToken(params['q']);
-    // document.cookie = `pramata_add_in_jwt_token=${params['q']}; expires=${new Date(Date.now() + 86400e3).toUTCString()}; path=/`;
-    // debugger;
+    document.cookie = `pramata_add_in_jwt_token=${params['q']}; SameSite=None; Secure; expires=${new Date(Date.now() + 86400e3).toUTCString()}; path=/`;
+    debugger;
     handleDialog(params['q']);
   }, []);
 

@@ -27,43 +27,33 @@ const App = (props) => {
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    const jwtToken = Office.context.document.settings.get('pramata_add_in_jwt_token');
-
-    if (jwtToken=='some_random_token') {
-      setAuthenticated(true);
-    } else {
-      setAuthenticated(false);
-      console.log('Authentication failed!');
-    }
-  }, []);
-
-  if (!authenticated) {
-    return <AuthPage />;
-  }
-
-  const handleLogout = () => {
-    // Clear the JWT token from document settings
-    Office.context.document.settings.remove('pramata_add_in_jwt_token');
-    Office.context.document.settings.saveAsync((result) => {
-      if (result.status === Office.AsyncResultStatus.Failed) {
-        console.error('Failed to clear token from settings:', result.error.message);
+    const cookies = document.cookie;
+    const jwtToken = cookies.split(';').find(cookie => cookie.trim().startsWith('pramata_add_in_jwt_token='));
+    if (jwtToken){
+      const token = jwtToken.split('=')
+      // const jwtToken = Office.context.document.settings.get('pramata_add_in_jwt_token');
+  
+      if (token[1]=='some_random_token') {
+        setAuthenticated(true);
       } else {
-        // Reload the add-in after clearing the token
-        window.location.reload();
+        setAuthenticated(false);
+        console.log('Authentication failed!');
       }
-    });
-  };
+    }
+   
+  }, []);
 
   return (
     <div className={styles.root}>
-      <Header
+      {authenticated ? (
+      <div>
+        <Accordion title="Replace/Find">
+          <div>
+          <Header
         logo="https://www.pramata.com/wp-content/uploads/2022/12/cropped-Copy-of-pramata-logo-2000px-1.png"
         title={props.title}
         message=""
       />
-      <div>
-        <Accordion title="Replace/Find">
-          <div>
             <h5>
               Replace or find its a straight forward functionality, here we want to display that we can acheive it via
               the add in.
@@ -108,8 +98,13 @@ const App = (props) => {
         <Accordion title="Gamma">
           <Gamma/>
         </Accordion>
-        <button onClick={handleLogout}>Logout</button>
+        {/* <button onClick={handleLogout}>Logout</button> */}
       </div>
+      ) : (
+        // Render authentication page if not authenticated
+        <AuthPage setAuthenticated={setAuthenticated} />
+        
+      )}
     </div>
   );
 };

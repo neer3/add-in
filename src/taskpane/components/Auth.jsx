@@ -1,16 +1,12 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import './Auth.css'
+import App from "./App";
 
-const AuthPage = ({ onAuthenticate }) => {
+const AuthPage = (props) => {
 
       const processMessage = (arg) => {
-        Office.context.document.settings.set('pramata_add_in_jwt_token', arg['message']);
-        Office.context.document.settings.saveAsync((result) => {
-            if (result.status === Office.AsyncResultStatus.Failed) {
-              console.error('Failed to save token to settings:', result.error.message);
-            }
-          });
+            props.setAuthenticated(true);
       };
     
       const handleLogin = async() => {
@@ -21,9 +17,17 @@ const AuthPage = ({ onAuthenticate }) => {
                 processMessage(arg);
                 dialog.close();
             });
+            dialog.addEventHandler(Office.EventType.DialogEventReceived, (arg) => {
+                if (arg.error) {
+                  // Handle error if dialog failed to close
+                  console.error('Error closing dialog:', arg.error.message);
+                } else {
+                  // Redirect to App.jsx after dialog is closed
+                  window.location.href="https://localhost:3000/taskpane.html"
+                }
+              });
           })
         });
-        onAuthenticate(true)
       };
 
   return (
@@ -39,8 +43,8 @@ const AuthPage = ({ onAuthenticate }) => {
   );
 };
 
-AuthPage.propTypes = {
-  onAuthenticate: PropTypes.func.isRequired,
-};
+// AuthPage.propTypes = {
+//   onAuthenticate: PropTypes.func.isRequired,
+// };
 
 export default AuthPage;
