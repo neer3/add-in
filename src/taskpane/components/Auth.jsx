@@ -1,27 +1,30 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import './Auth.css'
-import Header from "./Header";
 
 const AuthPage = ({ onAuthenticate }) => {
-    const setJwtTokenInCookie = (token) => {
-        // Set the JWT token in a cookie
-        document.cookie = `pramata_add_in_jwt_token=${token}; path=/`;
+
+      const processMessage = (arg) => {
+        Office.context.document.settings.set('jwtToken', arg['message']);
+        Office.context.document.settings.saveAsync((result) => {
+            if (result.status === Office.AsyncResultStatus.Failed) {
+              console.error('Failed to save token to settings:', result.error.message);
+            }
+          });
       };
-  const handleLogin = async() => {
-    setJwtTokenInCookie("Admin123")
-    // await Word.run(async (context) => {
-    //   Office.context.ui.displayDialogAsync('https://localhost:3000/login.html', {height: 30, width: 20}, (asyncResult) => {
-    //     const dialog = asyncResult.value;
-    //     dialog.addEventHandler(Office.EventType.DialogMessageReceived, (arg) => {
-    //         debugger;
-    //         dialog.close();
-    //         processMessage(arg);
-    //     });
-    //   })
-    // });
-    onAuthenticate()
-  };
+    
+      const handleLogin = async() => {
+        await Word.run(async (context) => {
+          Office.context.ui.displayDialogAsync('https://localhost:3000/login.html', {height: 60, width: 20}, (asyncResult) => {
+            const dialog = asyncResult.value;
+            dialog.addEventHandler(Office.EventType.DialogMessageReceived, (arg) => {
+                processMessage(arg);
+                dialog.close();
+            });
+          })
+        });
+        onAuthenticate(true)
+      };
 
   return (
     <div className="auth-component">

@@ -1,22 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>External Content Loader</title>
-  <script>
-      function login(){
-        window.location.replace("http://alpha.lvh.me:4100/users");
-      }
-  </script>
-</head>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0;url=http://alpha.lvh.me:4100/users">
+    <meta name="description" content="loggedin">
+    <title>Redirecting...</title>
+  </head>
   <body>
-    <h1>External Content Loader</h1>
-    <p>This page will load content from another domain.</p>
-    <button onclick="login()">Click</button>
-    <div id="externalContent">
-        <!-- Fetched content will be displayed here -->
-    </div>
-    <div id="container"></div>
+    <p>If you are not redirected automatically, follow this <a href="http://alpha.lvh.me:4100/users">link</a>.</p>
   </body>
 </html>

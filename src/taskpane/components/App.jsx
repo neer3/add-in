@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import Header from "./Header";
 import HeroList from "./HeroList";
@@ -26,33 +26,21 @@ const App = (props) => {
   const styles = useStyles();
   const [authenticated, setAuthenticated] = useState(false);
 
-  const clearCookies = () => {
-    const cookies = document.cookie.split(';');
-  
-    cookies.forEach(cookie => {
-      const cookieParts = cookie.split('=');
-      const cookieName = cookieParts[0].trim();
-      document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
-    });
-  };
+  useEffect(() => {
+    const jwtToken = Office.context.document.settings.get('jwtToken');
 
-  const authenticate = () => {
-    const cookies = document.cookie;
-    const jwtToken = cookies.split(';').find(cookie => cookie.trim().startsWith('pramata_add_in_jwt_token='));
-    const token = jwtToken.split('=')
-    console.log(token[1])
-    // clearCookies()
-    if (token[1]=='Admin123') {
+    if (jwtToken=='some_random_token') {
       setAuthenticated(true);
     } else {
       setAuthenticated(false);
       console.log('Authentication failed!');
     }
-  };
 
-  if (!authenticated) {
-    return <AuthPage onAuthenticate={authenticate} />;
-  }
+    if (!authenticated) {
+      return <AuthPage />;
+    }
+  }, []);
+
   return (
     <div className={styles.root}>
       <Header
