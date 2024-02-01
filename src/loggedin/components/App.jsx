@@ -1,10 +1,25 @@
-import * as React from "react";
+import React, { useEffect, useState } from 'react';
 
 const App = () => {
-  const handleDialog = async() => {
+  // const [token, setToken] = useState('');
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const params = {};
+
+    for (const [key, value] of searchParams.entries()) {
+      params[key] = value;
+    }
+
+    // setToken(params['q']);
+    document.cookie = `pramata_add_in_jwt_token=${params['q']}; SameSite=None; Secure; expires=${new Date(Date.now() + 86400e3).toUTCString()}; path=/`;
+    debugger;
+    handleDialog(params['q']);
+  }, []);
+
+  const handleDialog = async(token) => {
     await Word.run(async (context) => {
-      debugger;
-      Office.context.ui.messageParent("DataToPass");
+      Office.context.ui.messageParent(token);
     });
   };
 

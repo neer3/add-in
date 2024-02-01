@@ -1,19 +1,20 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import Header from "./Header";
 import HeroList from "./HeroList";
 import TextInsertion from "./TextInsertion";
 import Comment from "./Comment";
 import Accordion from "./Accordion";
-import { Button, makeStyles } from "@fluentui/react-components";
+import { Button, makeStyles, tokens } from "@fluentui/react-components";
 import { Ribbon24Regular, LockOpen24Regular, DesignIdeas24Regular } from "@fluentui/react-icons";
 import TextExport from "./TextExport";
 import ApprovalComponent from "./ApprovalComponent";
 import Insert from "./Insert";
 import ReplaceComponent from "./ReplaceComponent";
 import FindComponent from "./FindComponent";
-import GenAi from "./GenAi";
+// import GenAi from "./GenAi";
 import Gamma from "./Gamma";
+import AuthPage from "./Auth";
 
 const useStyles = makeStyles({
   root: {
@@ -23,18 +24,36 @@ const useStyles = makeStyles({
 
 const App = (props) => {
   const styles = useStyles();
-  // The list items are static and won't change at runtime,
-  // so this should be an ordinary const, not a part of state.
+  const [authenticated, setAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const cookies = document.cookie;
+    const jwtToken = cookies.split(';').find(cookie => cookie.trim().startsWith('pramata_add_in_jwt_token='));
+    if (jwtToken){
+      const token = jwtToken.split('=')
+      // const jwtToken = Office.context.document.settings.get('pramata_add_in_jwt_token');
+  
+      if (token[1]=='some_random_token') {
+        setAuthenticated(true);
+      } else {
+        setAuthenticated(false);
+        console.log('Authentication failed!');
+      }
+    }
+   
+  }, []);
+
   return (
     <div className={styles.root}>
-      <Header
+      {authenticated ? (
+      <div>
+        <Accordion title="Replace/Find">
+          <div>
+          <Header
         logo="https://www.pramata.com/wp-content/uploads/2022/12/cropped-Copy-of-pramata-logo-2000px-1.png"
         title={props.title}
         message=""
       />
-      <div>
-        <Accordion title="Replace/Find">
-          <div>
             <h5>
               Replace or find its a straight forward functionality, here we want to display that we can acheive it via
               the add in.
@@ -73,13 +92,19 @@ const App = (props) => {
           <div><h5>The word document can Exported at the end. Have option to export with or without red lined changes.</h5></div>
           <div><TextExport/></div>
         </Accordion>
-        <Accordion title="GenAI">
+        {/* <Accordion title="GenAI">
           <GenAi/>
-        </Accordion>
+        </Accordion> */}
         <Accordion title="Gamma">
           <Gamma/>
         </Accordion>
+        {/* <button onClick={handleLogout}>Logout</button> */}
       </div>
+      ) : (
+        // Render authentication page if not authenticated
+        <AuthPage setAuthenticated={setAuthenticated} />
+        
+      )}
     </div>
   );
 };
