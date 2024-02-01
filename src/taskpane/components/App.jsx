@@ -35,11 +35,24 @@ const App = (props) => {
       setAuthenticated(false);
       console.log('Authentication failed!');
     }
-
-    if (!authenticated) {
-      return <AuthPage />;
-    }
   }, []);
+
+  if (!authenticated) {
+    return <AuthPage />;
+  }
+
+  const handleLogout = () => {
+    // Clear the JWT token from document settings
+    Office.context.document.settings.remove('jwtToken');
+    Office.context.document.settings.saveAsync((result) => {
+      if (result.status === Office.AsyncResultStatus.Failed) {
+        console.error('Failed to clear token from settings:', result.error.message);
+      } else {
+        // Reload the add-in after clearing the token
+        window.location.reload();
+      }
+    });
+  };
 
   return (
     <div className={styles.root}>
@@ -95,6 +108,7 @@ const App = (props) => {
         <Accordion title="Gamma">
           <Gamma/>
         </Accordion>
+        <button onClick={handleLogout}>Logout</button>
       </div>
     </div>
   );
