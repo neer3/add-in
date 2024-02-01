@@ -5,7 +5,7 @@ import './Auth.css'
 const AuthPage = ({ onAuthenticate }) => {
 
       const processMessage = (arg) => {
-        Office.context.document.settings.set('jwtToken', arg['message']);
+        Office.context.document.settings.set('pramata_add_in_jwt_token', arg['message']);
         Office.context.document.settings.saveAsync((result) => {
             if (result.status === Office.AsyncResultStatus.Failed) {
               console.error('Failed to save token to settings:', result.error.message);

@@ -27,7 +27,7 @@ const App = (props) => {
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    const jwtToken = Office.context.document.settings.get('jwtToken');
+    const jwtToken = Office.context.document.settings.get('pramata_add_in_jwt_token');
 
     if (jwtToken=='some_random_token') {
       setAuthenticated(true);
@@ -43,7 +43,7 @@ const App = (props) => {
 
   const handleLogout = () => {
     // Clear the JWT token from document settings
-    Office.context.document.settings.remove('jwtToken');
+    Office.context.document.settings.remove('pramata_add_in_jwt_token');
     Office.context.document.settings.saveAsync((result) => {
       if (result.status === Office.AsyncResultStatus.Failed) {
         console.error('Failed to clear token from settings:', result.error.message);
