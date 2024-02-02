@@ -47,13 +47,13 @@ const App = (props) => {
     <div className={styles.root}>
       {authenticated ? (
       <div>
-        <Accordion title="Replace/Find">
-          <div>
-          <Header
+        <Header
         logo="https://www.pramata.com/wp-content/uploads/2022/12/cropped-Copy-of-pramata-logo-2000px-1.png"
         title={props.title}
         message=""
       />
+        <Accordion title="Replace/Find">
+          <div>
             <h5>
               Replace or find its a straight forward functionality, here we want to display that we can acheive it via
               the add in.
