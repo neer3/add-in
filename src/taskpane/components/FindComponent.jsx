@@ -3,6 +3,7 @@ import './FindComponent.css'; // Import CSS file for styling
 
 const FindComponent = () => {
   const [inputValue, setInputValue] = useState('');
+  const [index, setIndex] = useState(0);
 
   const handleFind = async() => {
     // Perform find operation here
@@ -13,11 +14,30 @@ const FindComponent = () => {
       results.load("length");
 
       await context.sync();
-      for (let i = 0; i < results.items.length; i++) {
-        results.items[i].font.highlightColor = "yellow";
+      if (index < results.items.length){
+        results.items[index].font.highlightColor = "yellow";
+        results.items[index].select();
+        results.items[index].getRange().scrollIntoView();
       }
+      // for (let i = 0; i < results.items.length; i++) {
+      //   results.items[i].font.highlightColor = "yellow";
+      // }
+      // Navigate to the first search result
+    
+
+    await context.sync();
     });
   };
+
+  const handleNext = () =>{
+    setIndex(index + 1);
+    handleFind();
+  }
+
+  const handleBack = () =>{
+    setIndex(index - 1);
+    handleFind();
+  }
 
   const resetHighlight = async() => {
     console.log('Find value:', inputValue);
@@ -37,6 +57,7 @@ const FindComponent = () => {
     });
 
     setInputValue('');
+    setIndex(0)
   };
 
   return (
@@ -53,6 +74,8 @@ const FindComponent = () => {
       </div>
       <div className="button-container">
         <button onClick={handleFind} className="find-button">Find</button>
+        <button onClick={handleBack} className="find-button">Back</button>
+        <button onClick={handleNext} className="find-button">Next</button>
         <button onClick={resetHighlight} className="reset-button">Reset</button>
       </div>
     </div>
