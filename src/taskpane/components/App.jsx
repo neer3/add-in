@@ -95,9 +95,9 @@ const App = (props) => {
         {/* <Accordion title="GenAI">
           <GenAi/>
         </Accordion> */}
-        <Accordion title="Gamma">
+        {/* <Accordion title="Gamma">
           <Gamma/>
-        </Accordion>
+        </Accordion> */}
         {/* <button onClick={handleLogout}>Logout</button> */}
       </div>
       ) : (
