@@ -1,9 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import './Pagination.css'
 
 export default function Pagination({ items, itemsPerPage, handlePagination }) {
   // Calculate the number of pages
   const pages = Math.ceil(items.length / itemsPerPage);
+  const [selectedButton,setSelectedButton]=useState(0);
+  const handleSelection = (buttonId) => {
+    setSelectedButton(buttonId);
+    handlePagination(buttonId)
+  };
+
 
   // Create an array of page numbers
   const pageNumbers = [];
@@ -17,8 +23,11 @@ export default function Pagination({ items, itemsPerPage, handlePagination }) {
       {pageNumbers.map((number) => (
         <button
           key={number}
-          onClick={() => handlePagination(number)}
+          onClick={() => handleSelection(number)}
           className="page-button"
+          style={{
+            backgroundColor: selectedButton === number ? "#0056b3" : "gray",
+          }}
         >
           {number}
         </button>
