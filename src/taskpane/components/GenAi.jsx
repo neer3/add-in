@@ -175,6 +175,7 @@ const GenAi = () => {
           <pre className="response-data">{JSON.stringify(responseData, null, 2)}</pre>
         </div>
       )}
+      <br/>
       <button onClick={ documentToCsv} className="button">Get the legal clauses</button>
       <div id="valuesContainer">
       {currentItems.length > 0 &&
