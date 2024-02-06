@@ -112,7 +112,7 @@ const GenAi = () => {
 
   const documentToCsv = async () => {
     let csvRows = [];
-    csvRows.push("index,paragraph")
+    csvRows.push('"index","paragraph"');
     await Word.run(async (context) => {
       const body = context.document.body;
       const paragraphs = body.paragraphs;
@@ -123,7 +123,7 @@ const GenAi = () => {
         let text = paragraph.text;
         text = text.replace(/[^a-zA-Z0-9\s]/g, "");
         if (text.length>2){
-        let csvRow = i + "," + text;
+          let csvRow = i + ',"' + text + '"';
         csvRows.push(csvRow);
         }
       }
