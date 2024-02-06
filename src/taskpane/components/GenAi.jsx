@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './GenAi.css'; // Import CSS file
 import Pagination from "./Pagination";
+import Accordion from './Accordion';
+import Loader from './Loader';
 
 const GenAi = () => {
   const [responseData, setResponseData] = useState([]);
@@ -63,6 +65,51 @@ const GenAi = () => {
 
         const data = await response.json();
         setResponseData(data.text);
+      } catch (error) {
+        console.error('Error fetching data:', error.message);
+      }
+    });
+  };
+
+
+  const fetchSuggestion = async () => {
+    await Word.run(async (context) => {
+      var selection = context.document.getSelection();
+      context.load(selection, 'text');
+
+      await context.sync();
+
+      var selectedText = selection.text;
+
+      if(selectedText.length === 0){
+        return;
+      }
+
+      const token =
+      "";
+      const baseUrl = "https://alpha.lvh.me:5400/api/v1/usage_metrics/gen_ai_suggestion";
+
+      var bodyParams = {
+        'text': selectedText
+      };
+
+      try {
+        const response = await fetch(baseUrl, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(bodyParams)
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
+        const data = await response.json();
+        debugger;
+        context.document.getSelection().insertComment(data["text"]);
       } catch (error) {
         console.error('Error fetching data:', error.message);
       }
@@ -161,27 +208,31 @@ const GenAi = () => {
 
   return (
     <div>
-      <button className="button" onClick={fetchData}>Summarize Data</button>
-      <br/>
-      <button onClick={ documentToCsv} className="button">Get the legal clauses</button>
-      <div id="valuesContainer">
-      {responseData.length > 0 &&
-        responseData.map((pair) => (
-          <div key={pair.index}>
-            <p
-              onClick={() => scrollToParagraph(pair.index)}
-              style={{ cursor: "pointer" }}
-            >
-              {pair.clause}
-            </p>
-          </div>
-        ))}
-      <Pagination
-        items={responseData}
-        itemsPerPage={itemsPerPage}
-        handlePagination={handlePagination}
-      />
-    </div>
+      <Accordion title="Suggestive changes">
+        <button className="button" onClick={fetchSuggestion}>Suggestive changes (selected clause)</button>
+      </Accordion>
+      <Accordion title="Legal Clauses">
+        <button onClick={ documentToCsv} className="button">Get the legal clauses</button>
+        <div id="valuesContainer">
+        {responseData.length > 0 ?
+          responseData.map((pair) => (
+            <div key={pair.index}>
+              <p
+                onClick={() => scrollToParagraph(pair.index)}
+                style={{ cursor: "pointer" }}
+              >
+                {pair.clause}
+              </p>
+            </div>
+          )) : calledLLM && <Loader/>}
+        <Pagination
+          items={responseData}
+          itemsPerPage={itemsPerPage}
+          handlePagination={handlePagination}
+        />
+        
+        </div>
+      </Accordion>
     </div>
   );
 };

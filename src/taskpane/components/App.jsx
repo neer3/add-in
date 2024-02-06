@@ -53,7 +53,7 @@ const App = (props) => {
         title={props.title}
         message=""
       />
-        <Accordion title="Replace/Find">
+        {/* <Accordion title="Replace/Find">
           <div>
             <h5>
               Replace or find its a straight forward functionality, here we want to display that we can acheive it via
@@ -92,7 +92,7 @@ const App = (props) => {
         <Accordion title="Original/Current">
           <div><h5>The word document can Exported at the end. Have option to export with or without red lined changes.</h5></div>
           <div><TextExport/></div>
-        </Accordion>
+        </Accordion> */}
         {/* <Accordion title="Chat with GenAI">
           <div><h5>The word document can Exported at the end. Have option to export with or without red lined changes.</h5></div>
           <div><TextChat/></div>
