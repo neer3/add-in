@@ -12,10 +12,10 @@ import ApprovalComponent from "./ApprovalComponent";
 import Insert from "./Insert";
 import ReplaceComponent from "./ReplaceComponent";
 import FindComponent from "./FindComponent";
-// import GenAi from "./GenAi";
+import GenAi from "./GenAi";
 import Gamma from "./Gamma";
 import AuthPage from "./Auth";
-import TextChat from "./TextChat";
+// import TextChat from "./TextChat";
 
 const useStyles = makeStyles({
   root: {
@@ -93,13 +93,13 @@ const App = (props) => {
           <div><h5>The word document can Exported at the end. Have option to export with or without red lined changes.</h5></div>
           <div><TextExport/></div>
         </Accordion>
-        <Accordion title="Chat with GenAI">
+        {/* <Accordion title="Chat with GenAI">
           <div><h5>The word document can Exported at the end. Have option to export with or without red lined changes.</h5></div>
           <div><TextChat/></div>
-        </Accordion>
-        {/* <Accordion title="GenAI">
-          <GenAi/>
         </Accordion> */}
+        <Accordion title="GenAI">
+          <GenAi/>
+        </Accordion>
         {/* <Accordion title="Gamma">
           <Gamma/>
         </Accordion> */}
