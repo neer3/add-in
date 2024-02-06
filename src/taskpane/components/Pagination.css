@@ -1,0 +1,8 @@
+.page-button {
+    border: none;
+    color: aliceblue;
+    background-color: gray;
+}
+.page-button:hover {
+    background-color: #0056b3;
+  }
