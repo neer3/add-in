@@ -15,6 +15,7 @@ import FindComponent from "./FindComponent";
 import GenAi from "./GenAi";
 import Gamma from "./Gamma";
 import AuthPage from "./Auth";
+import Chat from "./Chat";
 // import TextChat from "./TextChat";
 
 const useStyles = makeStyles({
@@ -99,6 +100,9 @@ const App = (props) => {
         </Accordion> */}
         <Accordion title="GenAI">
           <GenAi/>
+        </Accordion>
+        <Accordion title="Adhoc">
+          <Chat/>
         </Accordion>
         {/* <Accordion title="Gamma">
           <Gamma/>
