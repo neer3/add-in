@@ -253,21 +253,25 @@ class Chat extends Component {
     messages.forEach((messageObject) => {
       if (!messageObject.button) {
         const inputString = messageObject.message;
-        const match = this.textParser(inputString);
-        if (match) {
-          toChange = true;
-          let newLines = [];        
-          const lines = [...match];
-          lines.forEach((line, index) => {
-            if (index !== 1) {
-              newLines.push(line.split("|").slice(1,-1).map((data) => {return data.trim()}));
-            }
-          })
-          messageObject.button = {
-            "label": ANALYZE_DATA,
-            "data": newLines
-          }
-        }        
+        if (!inputString){
+          messageObject
+
+        }
+        // const match = this.textParser(inputString);
+        // if (match) {
+        //   toChange = true;
+        //   let newLines = [];        
+        //   const lines = [...match];
+        //   lines.forEach((line, index) => {
+        //     if (index !== 1) {
+        //       newLines.push(line.split("|").slice(1,-1).map((data) => {return data.trim()}));
+        //     }
+        //   })
+        //   messageObject.button = {
+        //     "label": ANALYZE_DATA,
+        //     "data": newLines
+        //   }
+        // }        
       }
       processedMessages.push({...messageObject});
     })
@@ -279,9 +283,9 @@ class Chat extends Component {
   renderConversation = (messages) => {
     let chatItems = [];
     const { streamingData } = this.state;
-    if (!streamingData) {
-      this.preProcessChatMessages(messages);
-    }
+    // if (!streamingData) {
+    //   this.preProcessChatMessages(messages);
+    // }
     
     messages.forEach((chat, i) => {
       chatItems.push(
@@ -289,7 +293,7 @@ class Chat extends Component {
           <i className={chat.user ? "icon-user" : "icon-bot"} />
           <div className={chat.user ? "content user" : "content assistant"}>
             <Markdown remarkPlugins={[remarkGfm]}>
-              {chat.message}
+              {typeof chat.message =='undefined'?JSON.parse(chat).message.body:chat.message}
             </Markdown>
             {chat.button ? this.renderChatButton(chat) : <></>}
           </div>
