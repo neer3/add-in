@@ -30,9 +30,13 @@
     "@fluentui/react-icons": "^2.0.214",
     "core-js": "^3.9.1",
     "es6-promise": "^4.2.8",
+    "papaparse": "^5.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "regenerator-runtime": "^0.13.7"
+    "react-markdown": "^9.0.1",
+    "regenerator-runtime": "^0.13.7",
+    "remark-gfm": "^4.0.0",
+    "semantic-ui-react": "^2.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.13.10",

@@ -1,0 +1,80 @@
+.header {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .editor-field {
+    align-items: stretch;
+    display: flex;
+    width: 100%;
+  }
+  
+
+  .body.markdown-body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  
+#chat-bot-ui .new-chat {
+    background: white;
+    bottom: 0;
+    position: sticky;
+    border-top: 1px solid #b9b9b9;
+    padding: 5px;
+    z-index: 10;
+  }
+  
+  #chat-bot-ui .new-chat .chat-form {
+    margin-top: 5px;
+  }
+  
+  #chat-bot-ui .quick-actins-button {
+    background: #1799cb;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 0 5px 5px 0;
+    font-weight: normal;
+  }
+  
+  #chat-bot-ui .quick-actins-button:disabled {
+    pointer-events: none;
+    opacity: 0.65;
+  }
+
+  .editor-field textarea.user-chat {
+    width: 80%;
+    max-height: 120px;
+    flex-grow: 1;
+  }
+
+  .icon-bot {
+    display: inline-block;
+    padding: 6px 4px;
+    margin-right: 10px;
+    flex-shrink: 0;
+    color: #000;
+    font-size: 25px;
+  }
+
+  .body.markdown-body .chat .content {
+    margin: 6px 15px;
+    padding: 4px 10px;
+    border-radius: 5px;
+  }
+  
+  .body.markdown-body .chat .content.user {
+    background: #f4f4f4;
+  } 
+
+  .editor-field .chat-action-icons {
+    align-self: flex-end;
+    flex-shrink: 0;
+    padding: 8px 12px;
+  }

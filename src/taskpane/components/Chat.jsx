@@ -1,4 +1,8 @@
 import React, { Component } from "react";
+import { Form} from "semantic-ui-react";
+import './Bot.css';
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 class Chat extends Component {
   constructor(props) {
@@ -74,7 +78,7 @@ class Chat extends Component {
     };
   }
 
-  sendMessage = async () => {
+  startInteract = async (payload) => {
     var docSelection = '';
     await Word.run(async (context) => {
       var selection = context.document.getSelection();
@@ -96,41 +100,33 @@ class Chat extends Component {
       docSelection = selection.text;
     });
 
-    var payload = {
-      feature: "addin",
-      question_content: this.state.input,
-      prompt_api_label: "AdhocPrompt",
-      app_api_label: "AdhocPrompt",
-      mapping_id: 0,
-      context: "ALL",
-      conversation_id: "fgox2wff1707804736774",
-      scrollToBottom: true,
-      route: "interaction",
-      chat_request_id: "fgox2wff1707804736780",
-    };
     payload["reportsData"] = docSelection;
 
     if (payload["reportsData"].length <= 5) {
       return;
     }
-    var baseUrl = "https://alpha.lvh.me:5701/api/v1/reports_chat/fgox2wff1707804736774/interaction"
+    var baseUrl = "https://alpha.lvh.me:5700/api/v1/reports_chat/fgox2wff1707804736774/interaction"
     try {
-      const response = await fetch(baseUrl, {
+      fetch(baseUrl, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer `,
+          Authorization: ``,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch data');
-      }
-
-      const data = await response.json();
-      debugger;
-      // setResponseData(data.text);
+      }).then((resp) => {
+        if (resp.status === 201) {
+          return resp.json();
+        } else if (resp.status === 204) {
+          return null;
+        }
+        throw resp;
+      }).then((resp) => {
+          this.setState({
+            requests: [],
+            streamingData: false
+          });          
+      }).catch(this.setSometingWrong);
     } catch (error) {
       debugger;
     }
@@ -152,7 +148,7 @@ class Chat extends Component {
     //   }).catch(this.setSometingWrong);
 
     // this.ws.send(this.state.input);
-    this.setState({ input: "" });
+    // this.setState({ input: "" });
   };
 
   fetchDataFromDoc = async () => {
@@ -178,16 +174,257 @@ class Chat extends Component {
     });
   };
 
+  scrollToBottom = () => {
+    let scrollDiv = document.querySelector(".chatbot-container");;
+    scrollDiv.scrollTop = scrollDiv.scrollHeight;
+  };
+
+  newConversationId = () => {
+    return `${this.guid}${new Date().getTime()}`;
+  };
+
+  handleSendMessage = () => {
+    const { input, streamingData, messages } = this.state;
+    const { reportsData, exportPayload } = this.props;
+    let { conversationId } = this.state;
+
+    if (!streamingData && input.trim() !== '') {
+      // conversationId = conversationId || this.newConversationId();
+      conversationId = "fgox2wff1707804736774";
+      let queryParams = {
+        feature: "addin",
+        question_content: this.state.input,
+        prompt_api_label: "AdhocPrompt",
+        app_api_label: "AdhocPrompt",
+        mapping_id: 0,
+        context: "ALL",
+        conversation_id: "fgox2wff1707804736774",
+        scrollToBottom: true,
+        route: "interaction",
+        chat_request_id: "fgox2wff1707804736780",
+      };
+      this.setState({
+        messages: [
+          // ...conversationId === this.state.conversationId ? messages : [],
+          ...conversationId === "fgox2wff1707804736774" ? messages : [],
+          {
+            message: input, user: true, type: 'question',
+            messsageChunks: [
+              { text: input, index: 0 }
+            ]
+          },
+          {
+            message: "Processing ...", user: false, type: 'in-progress',
+            messsageChunks: [
+              { text: "Processing ...", index: 0 }
+            ]
+          }
+        ],
+        streamingData: true,
+        input: '',
+        conversationId
+      });
+      setTimeout(this.scrollToBottom, 100);
+      setTimeout(this.startInteract, 3000, queryParams);
+    }
+  };
+
+
+  textParser = (text) => {
+    let tableLines = null;
+    text.split('\n').forEach(line => {
+        line = line.trim();
+        if (!line) return '';
+        if (line.startsWith('|') && line.endsWith('|')) {
+          if (tableLines === null) {
+            tableLines = [];
+          }
+          tableLines.push(line);
+        };
+    });
+
+    return tableLines;
+  };
+
+  preProcessChatMessages = (messages) => {
+    let processedMessages = [];
+    let toChange = false;
+
+    messages.forEach((messageObject) => {
+      if (!messageObject.button) {
+        const inputString = messageObject.message;
+        const match = this.textParser(inputString);
+        if (match) {
+          toChange = true;
+          let newLines = [];        
+          const lines = [...match];
+          lines.forEach((line, index) => {
+            if (index !== 1) {
+              newLines.push(line.split("|").slice(1,-1).map((data) => {return data.trim()}));
+            }
+          })
+          messageObject.button = {
+            "label": ANALYZE_DATA,
+            "data": newLines
+          }
+        }        
+      }
+      processedMessages.push({...messageObject});
+    })
+    if (toChange) {
+      this.setState({messages: processedMessages});
+    }    
+  }
+
+  renderConversation = (messages) => {
+    let chatItems = [];
+    const { streamingData } = this.state;
+    if (!streamingData) {
+      this.preProcessChatMessages(messages);
+    }
+    
+    messages.forEach((chat, i) => {
+      chatItems.push(
+        <div key={i} className="chat">
+          <i className={chat.user ? "icon-user" : "icon-bot"} />
+          <div className={chat.user ? "content user" : "content assistant"}>
+            <Markdown remarkPlugins={[remarkGfm]}>
+              {chat.message}
+            </Markdown>
+            {chat.button ? this.renderChatButton(chat) : <></>}
+          </div>
+        </div>
+      );
+    })
+    return chatItems;
+  };
+
+  handleStandardPromptClick = (prompt) => {
+    const { reportsData, exportPayload } = this.props
+
+    const conversationId = generatedId(this.guid);
+    let queryParams = {
+      reportsData: this.convertReportsData(reportsData),
+      exportPayload,
+      reportsToken: PramataSetting.authToken("reports-api"),
+      feature: "reports",
+      question_content: prompt.display_name,
+      question_type: "prompt",
+      conversation_id: conversationId,
+      prompt_api_label: prompt.api_label
+    };
+    this.setState(
+      {
+        messages: [
+          {
+            message: prompt.display_name, user: true, type: 'question',
+            messsageChunks: [
+              { text: prompt.display_name, index: 0 }
+            ]
+          },
+          {
+            message: "Processing ...", user: false, type: 'in-progress',
+            messsageChunks: [
+              { text: "Processing ...", index: 0 }
+            ]
+          }
+        ],
+        streamingData: true,
+        input: '',
+        conversationId
+      }
+    )
+    setTimeout(this.scrollToBottom, 100);
+    setTimeout(this.startInteract, 3000, queryParams);
+  };  
+
+  renderPrompts = (stdPrompts) => {
+    let prompts = [];
+
+    stdPrompts.forEach((prompt) => {
+      prompts.push(
+        <button
+          key={prompt.id}
+          className="ui button quick-actins-button"
+          onClick={() => this.handleStandardPromptClick(prompt)}
+          disabled={this.state.streamingData || this.state.wsInactive}
+        >
+          {prompt.display_name}
+        </button>
+      );
+    });
+    return prompts;
+  };  
+
   render() {
+    const { messages, input, streamingData, establishingSocketconnection, standardPrompts, analyseData } = this.state;
+
     return (
-      <div>
-        <div>
+      <div className="chatbot-container">
+        <div className="header">
+            GenAI Assist
+          </div>
+          <div className="body markdown-body" id="contract-chat">
+            <div className="chat-list" id="chat-list">
+              {this.renderConversation(messages)}
+            </div>
+          </div>
+          
+          <div className="new-chat">
+          <div className="quick-actins">
+            {this.renderPrompts(standardPrompts)}
+          </div>
+          <Form className="chat-form" autoComplete="off">
+            <Form.Field className="editor-field">
+              <textarea
+                onChange={(e) => {
+                  this.setState({ input: e.target.value });
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && !event.shiftKey) {
+                    event.preventDefault();
+                    this.handleSendMessage();
+                    return true;
+                  }
+                }}
+                className="user-chat"
+                name="chat"
+                placeholder="Generate a report to start asking questions"
+                ref={this.inputRef}
+                rows="1"
+                type="text"
+                value={input}
+                disabled={(streamingData || establishingSocketconnection)}
+              />
+              <div className="chat-action-icons">
+                {(streamingData || establishingSocketconnection) ?
+                  <span className="loading-dots">
+                    <span className="dot one">
+                      {"."}
+                    </span>
+                    <span className="dot two">
+                      {"."}
+                    </span>
+                    <span className="dot three">
+                      {"."}
+                    </span>
+                  </span> :
+                  <i className="large link icon icon-send"
+                    onClick={this.handleSendMessage}
+                  />
+                }
+              </div>
+            </Form.Field>
+          </Form>
+        </div>
+
+        {/* <div>
           {this.state.messages.map((message, index) => (
             <div key={index}>{message}</div>
           ))}
         </div>
         <input type="text" value={this.state.input} onChange={(e) => this.setState({ input: e.target.value })} />
-        <button onClick={this.sendMessage}>Send</button>
+        <button onClick={this.sendMessage}>Send</button> */}
       </div>
     );
   }
