@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { Form} from "semantic-ui-react";
-import './Bot.css';
+import { Form } from "semantic-ui-react";
+import "./Bot.css";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -28,17 +28,17 @@ class Chat extends Component {
   }
 
   initWebSocket = () => {
-    let websocketUrl = "wss://alpha.lvh.me:5701/api/v1/chat/fgox2wff1707804736774/ws?token=Bearer%20eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImFscGhhIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNTEwMDg1MH0.VAAKIKcZJzkurqCqfiMnItEkn1RXSeAdSNhDu5RBFxc";
-    return (new WebSocket(websocketUrl));
+    let websocketUrl =
+      "wss://alpha.lvh.me:5701/api/v1/chat/fgox2wff1707804736774/ws?token=Bearer%20eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImFscGhhIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNTEwMDg1MH0.VAAKIKcZJzkurqCqfiMnItEkn1RXSeAdSNhDu5RBFxc";
+    return new WebSocket(websocketUrl);
   };
-  
+
   componentWillUnmount() {
     // if (this.pingCheckTimer) {
     //   clearInterval(this.pingCheckTimer);
     // }
     this.ws.close();
-  };
-
+  }
 
   componentDidMount() {
     this.ws.onopen = () => {
@@ -75,61 +75,87 @@ class Chat extends Component {
         if (temp.message.body === "") {
           return;
         }
+        var messagesCopy = this.state.messages;
+
+        messagesCopy[messagesCopy.length - 1] = event.data;
         this.setState((prevState) => ({
-          messages: [event.data],
+          messages: messagesCopy,
         }));
       }
     };
   }
 
   startInteract = async (payload) => {
-    var docSelection = '';
-    await Word.run(async (context) => {
-      var selection = context.document.getSelection();
-      context.load(selection, 'text');
+    if (payload.prompt_api_label === "AddInSuggestions") {
+      var current_content = "";
+      var original_content = "";
+      await Word.run(async (context) => {
+        var selection = context.document.getSelection();
+        context.load(selection, "text");
 
-      await context.sync();
+        var v = selection.getReviewedText(Word.ChangeTrackingVersion.original);
 
-      // setSelectionData(selection.text);
-      console.log(selection);
+        var v2 = selection.getReviewedText(Word.ChangeTrackingVersion.current);
 
-      if(selection.text.length === 0){
-        // selection =
+        await context.sync();
 
-        //need to put the logic to get the whole doc in csv or any other format
+        current_content = v2.m_value;
+        original_content = v.m_value;
+      });
+      payload["reportsData"] = {
+        latest_contract: current_content,
+        previous_contract: original_content,
+      };
+    } else {
+      var docSelection = "";
+      await Word.run(async (context) => {
+        var selection = context.document.getSelection();
+        context.load(selection, "text");
 
+        await context.sync();
+
+        // setSelectionData(selection.text);
+        console.log(selection);
+
+        if (selection.text.length === 0) {
+          // selection =
+          return;
+        }
+        docSelection = selection.text;
+      });
+
+      payload["reportsData"] = docSelection;
+
+      if (payload["reportsData"].length <= 5) {
         return;
       }
-      docSelection = selection.text;
-    });
-
-    payload["reportsData"] = docSelection;
-
-    if (payload["reportsData"].length <= 5) {
-      return;
     }
+
     var baseUrl = "https://alpha.lvh.me:5701/api/v1/reports_chat/fgox2wff1707804736774/interaction";
     try {
       fetch(baseUrl, {
-        method: 'POST',
+        method: "POST",
         headers: {
           Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImFscGhhIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNTEwMDg1MH0.VAAKIKcZJzkurqCqfiMnItEkn1RXSeAdSNhDu5RBFxc`,
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload)
-      }).then((resp) => {
-        if (resp.status === 201) {
-          return resp.json();
-        } else if (resp.status === 204) {
-          return null;
-        }
-        throw resp;
-      }).then((resp) => {
+        body: JSON.stringify(payload),
+      })
+        .then((resp) => {
+          if (resp.status === 201) {
+            return resp.json();
+          } else if (resp.status === 204) {
+            return null;
+          }
+          throw resp;
+        })
+        .then((resp) => {
           this.setState({
             requests: [],
-            streamingData: false
+            streamingData: false,
           });
-      }).catch(this.setSometingWrong);
+        })
+        .catch(this.setSometingWrong);
     } catch (error) {
       debugger;
     }
@@ -157,7 +183,7 @@ class Chat extends Component {
   fetchDataFromDoc = async () => {
     await Word.run(async (context) => {
       var selection = context.document.getSelection();
-      context.load(selection, 'text');
+      context.load(selection, "text");
 
       await context.sync();
 
@@ -165,7 +191,7 @@ class Chat extends Component {
 
       // console.log(selectionData);
 
-      if(selectionData.length === 0){
+      if (selectionData.length === 0) {
         // selection =
 
         //need to put the logic to get the whole doc in csv or any other format
@@ -178,7 +204,7 @@ class Chat extends Component {
   };
 
   scrollToBottom = () => {
-    let scrollDiv = document.querySelector(".chatbot-container");;
+    let scrollDiv = document.querySelector(".chatbot-container");
     scrollDiv.scrollTop = scrollDiv.scrollHeight;
   };
 
@@ -191,9 +217,10 @@ class Chat extends Component {
     const { reportsData, exportPayload } = this.props;
     let { conversationId } = this.state;
 
-    if (!streamingData && input.trim() !== '') {
+    if (!streamingData && input.trim() !== "") {
       // conversationId = conversationId || this.newConversationId();
       conversationId = "fgox2wff1707804736774";
+
       let queryParams = {
         feature: "addin",
         question_content: this.state.input,
@@ -206,44 +233,59 @@ class Chat extends Component {
         route: "interaction",
         chat_request_id: "fgox2wff1707804736780",
       };
+
+      if (input === "AddInPrompt") {
+        queryParams = {
+          feature: "addin",
+          question_content: "",
+          prompt_api_label: "AddInSuggestions",
+          app_api_label: "AddInPrompt",
+          mapping_id: 11,
+          context: "ALL",
+          conversation_id: "fgox2wff1707804736774",
+          scrollToBottom: true,
+          route: "interaction",
+          chat_request_id: "fgox2wff1707804736780",
+        };
+      }
+
       this.setState({
         messages: [
           // ...conversationId === this.state.conversationId ? messages : [],
-          ...conversationId === "fgox2wff1707804736774" ? messages : [],
+          ...(conversationId === "fgox2wff1707804736774" ? messages : []),
           {
-            message: input, user: true, type: 'question',
-            messsageChunks: [
-              { text: input, index: 0 }
-            ]
+            message: input,
+            user: true,
+            type: "question",
+            messsageChunks: [{ text: input, index: 0 }],
           },
           {
-            message: "Processing ...", user: false, type: 'in-progress',
-            messsageChunks: [
-              { text: "Processing ...", index: 0 }
-            ]
-          }
+            message: "Processing ...",
+            user: false,
+            type: "in-progress",
+            messsageChunks: [{ text: "Processing ...", index: 0 }],
+          },
         ],
         streamingData: true,
-        input: '',
-        conversationId
+        input: "",
+        conversationId,
       });
       setTimeout(this.scrollToBottom, 100);
       setTimeout(this.startInteract, 3000, queryParams);
     }
   };
 
-
   textParser = (text) => {
     let tableLines = null;
-    text.split('\n').forEach(line => {
-        line = line.trim();
-        if (!line) return '';
-        if (line.startsWith('|') && line.endsWith('|')) {
-          if (tableLines === null) {
-            tableLines = [];
-          }
-          tableLines.push(line);
-        };
+    text.split("\n").forEach((line) => {
+      line = line.trim();
+      if (!line) return "";
+      if (line.startsWith("|") && line.endsWith("|")) {
+        if (tableLines === null) {
+          tableLines = [];
+        }
+        tableLines.push(line);
+      }
     });
 
     return tableLines;
@@ -256,14 +298,13 @@ class Chat extends Component {
     messages.forEach((messageObject) => {
       if (!messageObject.button) {
         const inputString = messageObject.message;
-        if (!inputString){
-          messageObject
-
+        if (!inputString) {
+          messageObject;
         }
         // const match = this.textParser(inputString);
         // if (match) {
         //   toChange = true;
-        //   let newLines = [];        
+        //   let newLines = [];
         //   const lines = [...match];
         //   lines.forEach((line, index) => {
         //     if (index !== 1) {
@@ -274,14 +315,14 @@ class Chat extends Component {
         //     "label": ANALYZE_DATA,
         //     "data": newLines
         //   }
-        // }        
+        // }
       }
-      processedMessages.push({...messageObject});
-    })
+      processedMessages.push({ ...messageObject });
+    });
     if (toChange) {
-      this.setState({messages: processedMessages});
-    }    
-  }
+      this.setState({ messages: processedMessages });
+    }
+  };
 
   renderConversation = (messages) => {
     let chatItems = [];
@@ -289,7 +330,7 @@ class Chat extends Component {
     // if (!streamingData) {
     //   this.preProcessChatMessages(messages);
     // }
-    
+
     messages.forEach((chat, i) => {
       chatItems.push(
         <div key={i} className="chat">
@@ -302,12 +343,12 @@ class Chat extends Component {
           </div>
         </div>
       );
-    })
+    });
     return chatItems;
   };
 
   handleStandardPromptClick = (prompt) => {
-    const { reportsData, exportPayload } = this.props
+    const { reportsData, exportPayload } = this.props;
 
     const conversationId = generatedId(this.guid);
     let queryParams = {
@@ -318,32 +359,30 @@ class Chat extends Component {
       question_content: prompt.display_name,
       question_type: "prompt",
       conversation_id: conversationId,
-      prompt_api_label: prompt.api_label
+      prompt_api_label: prompt.api_label,
     };
-    this.setState(
-      {
-        messages: [
-          {
-            message: prompt.display_name, user: true, type: 'question',
-            messsageChunks: [
-              { text: prompt.display_name, index: 0 }
-            ]
-          },
-          {
-            message: "Processing ...", user: false, type: 'in-progress',
-            messsageChunks: [
-              { text: "Processing ...", index: 0 }
-            ]
-          }
-        ],
-        streamingData: true,
-        input: '',
-        conversationId
-      }
-    )
+    this.setState({
+      messages: [
+        {
+          message: prompt.display_name,
+          user: true,
+          type: "question",
+          messsageChunks: [{ text: prompt.display_name, index: 0 }],
+        },
+        {
+          message: "Processing ...",
+          user: false,
+          type: "in-progress",
+          messsageChunks: [{ text: "Processing ...", index: 0 }],
+        },
+      ],
+      streamingData: true,
+      input: "",
+      conversationId,
+    });
     setTimeout(this.scrollToBottom, 100);
     setTimeout(this.startInteract, 3000, queryParams);
-  };  
+  };
 
   renderPrompts = (stdPrompts) => {
     let prompts = [];
@@ -361,26 +400,22 @@ class Chat extends Component {
       );
     });
     return prompts;
-  };  
+  };
 
   render() {
     const { messages, input, streamingData, establishingSocketconnection, standardPrompts, analyseData } = this.state;
 
     return (
       <div className="chatbot-container">
-        <div className="header">
-            GenAI Assist
+        <div className="header">GenAI Assist</div>
+        <div className="body markdown-body" id="contract-chat">
+          <div className="chat-list" id="chat-list">
+            {this.renderConversation(messages)}
           </div>
-          <div className="body markdown-body" id="contract-chat">
-            <div className="chat-list" id="chat-list">
-              {this.renderConversation(messages)}
-            </div>
-          </div>
-          
-          <div className="new-chat">
-          <div className="quick-actins">
-            {this.renderPrompts(standardPrompts)}
-          </div>
+        </div>
+
+        <div className="new-chat">
+          <div className="quick-actins">{this.renderPrompts(standardPrompts)}</div>
           <Form className="chat-form" autoComplete="off">
             <Form.Field className="editor-field">
               <textarea
@@ -401,25 +436,18 @@ class Chat extends Component {
                 rows="1"
                 type="text"
                 value={input}
-                disabled={(streamingData || establishingSocketconnection)}
+                disabled={streamingData || establishingSocketconnection}
               />
               <div className="chat-action-icons">
-                {(streamingData || establishingSocketconnection) ?
+                {streamingData || establishingSocketconnection ? (
                   <span className="loading-dots">
-                    <span className="dot one">
-                      {"."}
-                    </span>
-                    <span className="dot two">
-                      {"."}
-                    </span>
-                    <span className="dot three">
-                      {"."}
-                    </span>
-                  </span> :
-                  <i className="large link icon icon-send"
-                    onClick={this.handleSendMessage}
-                  />
-                }
+                    <span className="dot one">{"."}</span>
+                    <span className="dot two">{"."}</span>
+                    <span className="dot three">{"."}</span>
+                  </span>
+                ) : (
+                  <i className="large link icon icon-send" onClick={this.handleSendMessage} />
+                )}
               </div>
             </Form.Field>
           </Form>
