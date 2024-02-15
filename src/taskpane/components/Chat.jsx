@@ -28,7 +28,7 @@ class Chat extends Component {
   }
 
   initWebSocket = () => {
-    let websocketUrl = "";
+    let websocketUrl = "wss://alpha.lvh.me:5701/api/v1/chat/fgox2wff1707804736774/ws?token=Bearer%20eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImFscGhhIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNTEwMDg1MH0.VAAKIKcZJzkurqCqfiMnItEkn1RXSeAdSNhDu5RBFxc";
     return (new WebSocket(websocketUrl));
   };
   
@@ -71,8 +71,12 @@ class Chat extends Component {
       } else if (respJson.type === "confirm_subscription") {
         this.setState({ wsInactive: false });
       } else {
+        var temp = JSON.parse(event.data);
+        if (temp.message.body === "") {
+          return;
+        }
         this.setState((prevState) => ({
-          messages: [...prevState.messages, event.data],
+          messages: [event.data],
         }));
       }
     };
@@ -87,7 +91,6 @@ class Chat extends Component {
       await context.sync();
 
       // setSelectionData(selection.text);
-      debugger;
       console.log(selection);
 
       if(selection.text.length === 0){
@@ -105,12 +108,12 @@ class Chat extends Component {
     if (payload["reportsData"].length <= 5) {
       return;
     }
-    var baseUrl = "https://alpha.lvh.me:5700/api/v1/reports_chat/fgox2wff1707804736774/interaction"
+    var baseUrl = "https://alpha.lvh.me:5701/api/v1/reports_chat/fgox2wff1707804736774/interaction";
     try {
       fetch(baseUrl, {
         method: 'POST',
         headers: {
-          Authorization: ``,
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImFscGhhIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNTEwMDg1MH0.VAAKIKcZJzkurqCqfiMnItEkn1RXSeAdSNhDu5RBFxc`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
@@ -125,7 +128,7 @@ class Chat extends Component {
           this.setState({
             requests: [],
             streamingData: false
-          });          
+          });
       }).catch(this.setSometingWrong);
     } catch (error) {
       debugger;
@@ -293,7 +296,7 @@ class Chat extends Component {
           <i className={chat.user ? "icon-user" : "icon-bot"} />
           <div className={chat.user ? "content user" : "content assistant"}>
             <Markdown remarkPlugins={[remarkGfm]}>
-              {typeof chat.message =='undefined'?JSON.parse(chat).message.body:chat.message}
+              {typeof chat.message == "undefined" ? JSON.parse(chat).message.body : chat.message}
             </Markdown>
             {chat.button ? this.renderChatButton(chat) : <></>}
           </div>
@@ -393,7 +396,7 @@ class Chat extends Component {
                 }}
                 className="user-chat"
                 name="chat"
-                placeholder="Generate a report to start asking questions"
+                placeholder="Provide prompt"
                 ref={this.inputRef}
                 rows="1"
                 type="text"
