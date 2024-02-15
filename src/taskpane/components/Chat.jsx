@@ -107,23 +107,26 @@ class Chat extends Component {
     }
     var baseUrl = "https://alpha.lvh.me:5700/api/v1/reports_chat/fgox2wff1707804736774/interaction"
     try {
-      const response = await fetch(baseUrl, {
+      fetch(baseUrl, {
         method: 'POST',
         headers: {
           Authorization: ``,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
-      });
-      if (response.status === 201) {
-        return response.json();
-      } else if (response.status === 204) {
-        return null;
-      }
-
-      const data = await response.json();
-      debugger;
-      // setResponseData(data.text);
+      }).then((resp) => {
+        if (resp.status === 201) {
+          return resp.json();
+        } else if (resp.status === 204) {
+          return null;
+        }
+        throw resp;
+      }).then((resp) => {
+          this.setState({
+            requests: [],
+            streamingData: false
+          });          
+      }).catch(this.setSometingWrong);
     } catch (error) {
       debugger;
     }
