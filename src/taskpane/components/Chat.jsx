@@ -29,7 +29,7 @@ class Chat extends Component {
 
   initWebSocket = () => {
     let websocketUrl =
-      "wss://alpha.lvh.me:5701/api/v1/chat/fgox2wff1707804736774/ws?token=Bearer%20eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImFscGhhIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNTEwMDg1MH0.VAAKIKcZJzkurqCqfiMnItEkn1RXSeAdSNhDu5RBFxc";
+      "wss://alpha.lvh.me:5700/api/v1/chat/fgox2wff1707804736774/ws?token=Bearer%20eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImFscGhhIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNTEwMDg1MH0.VAAKIKcZJzkurqCqfiMnItEkn1RXSeAdSNhDu5RBFxc";
     return new WebSocket(websocketUrl);
   };
 
@@ -85,6 +85,32 @@ class Chat extends Component {
     };
   }
 
+  documentToCsv = async () => {
+    // if(calledLLM === true){
+    //   return;
+    // }
+
+    // setCalledLLM(true);
+    let csvRows = [];
+    csvRows.push('"index","paragraph"');
+    await Word.run(async (context) => {
+      const body = context.document.body;
+      const paragraphs = body.paragraphs;
+      paragraphs.load("text");
+      await context.sync();
+      for (let i = 0; i < paragraphs.items.length && i<20; i++) {
+        let paragraph = paragraphs.items[i];
+        let text = paragraph.text;
+        text = text.replace(/[^a-zA-Z0-9\s]/g, "");
+        if (text.length>2){
+          let csvRow = i + ',"' + text + '"';
+        csvRows.push(csvRow);
+        }
+      }
+    });
+    return csvRows.join("\n")
+  };
+
   startInteract = async (payload) => {
     if (payload.prompt_api_label === "AddInSuggestions") {
       var current_content = "";
@@ -107,31 +133,31 @@ class Chat extends Component {
         previous_contract: original_content,
       };
     } else {
-      var docSelection = "";
-      await Word.run(async (context) => {
-        var selection = context.document.getSelection();
-        context.load(selection, "text");
+      // var docSelection = "";
+      // await Word.run(async (context) => {
+      //   var selection = context.document.getSelection();
+      //   context.load(selection, "text");
 
-        await context.sync();
+      //   await context.sync();
 
-        // setSelectionData(selection.text);
-        console.log(selection);
+      //   // setSelectionData(selection.text);
+      //   console.log(selection);
 
-        if (selection.text.length === 0) {
-          // selection =
-          return;
-        }
-        docSelection = selection.text;
-      });
+      //   if (selection.text.length === 0) {
+      //     // selection =
+      //     return;
+      //   }
+      //   docSelection = selection.text;
+      // });
 
-      payload["reportsData"] = docSelection;
+      payload["reportsData"] = this.documentToCsv();
 
       if (payload["reportsData"].length <= 5) {
         return;
       }
     }
 
-    var baseUrl = "https://alpha.lvh.me:5701/api/v1/reports_chat/fgox2wff1707804736774/interaction";
+    var baseUrl = "https://alpha.lvh.me:5700/api/v1/reports_chat/fgox2wff1707804736774/interaction";
     try {
       fetch(baseUrl, {
         method: "POST",
