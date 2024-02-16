@@ -25,11 +25,12 @@ class Chat extends Component {
     this.lastPingReceivedTimestamp = Date.now();
     this.lastResponseReceivedTimestamp = Date.now();
     this.socketInitiateTime = Date.now();
+    this.guid = `${Math.random().toString(36).substring(2, 10)}${new Date().getTime()}`;
   }
 
   initWebSocket = () => {
     let websocketUrl =
-      "wss://alpha.lvh.me:5700/api/v1/chat/fgox2wff1707804736774/ws?token=Bearer%20eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImFscGhhIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNTEwMDg1MH0.VAAKIKcZJzkurqCqfiMnItEkn1RXSeAdSNhDu5RBFxc";
+      `wss://alpha.lvh.me:5701/api/v1/chat/${this.guid}/ws?token=Bearer%20eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImFscGhhIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNTEwMDg1MH0.VAAKIKcZJzkurqCqfiMnItEkn1RXSeAdSNhDu5RBFxc`;
     return new WebSocket(websocketUrl);
   };
 
@@ -46,7 +47,7 @@ class Chat extends Component {
         JSON.stringify({
           command: "subscribe",
           identifier: JSON.stringify({
-            guid: "fgox2wff1707804736774",
+            guid: this.guid,
             channel: `GenaiChatChannel`,
           }),
         })
@@ -98,17 +99,17 @@ class Chat extends Component {
       const paragraphs = body.paragraphs;
       paragraphs.load("text");
       await context.sync();
-      for (let i = 0; i < paragraphs.items.length && i<20; i++) {
+      for (let i = 0; i < paragraphs.items.length && i < 20; i++) {
         let paragraph = paragraphs.items[i];
         let text = paragraph.text;
         text = text.replace(/[^a-zA-Z0-9\s]/g, "");
-        if (text.length>2){
+        if (text.length > 2) {
           let csvRow = i + ',"' + text + '"';
-        csvRows.push(csvRow);
+          csvRows.push(csvRow);
         }
       }
     });
-    return csvRows.join("\n")
+    return csvRows.join("\n");
   };
 
   startInteract = async (payload) => {
@@ -150,14 +151,32 @@ class Chat extends Component {
       //   docSelection = selection.text;
       // });
 
-      payload["reportsData"] = this.documentToCsv();
+      let csvRows = [];
+      csvRows.push('"paragraph index","legal text"');
+      await Word.run(async (context) => {
+        const body = context.document.body;
+        const paragraphs = body.paragraphs;
+        paragraphs.load("text");
+        await context.sync();
+        for (let i = 0; i < paragraphs.items.length && i < 10; i++) {
+          let paragraph = paragraphs.items[i];
+          let text = paragraph.text;
+          text = text.replace(/[^a-zA-Z0-9\s]/g, "");
+          if (text.length > 2) {
+            let csvRow = i + ',"' + text + '"';
+            csvRows.push(csvRow);
+          }
+        }
+      });
+
+      payload["reportsData"] = csvRows.join("\n");
 
       if (payload["reportsData"].length <= 5) {
         return;
       }
     }
 
-    var baseUrl = "https://alpha.lvh.me:5700/api/v1/reports_chat/fgox2wff1707804736774/interaction";
+    var baseUrl = `https://alpha.lvh.me:5701/api/v1/reports_chat/${this.guid}/interaction`;
     try {
       fetch(baseUrl, {
         method: "POST",
@@ -245,7 +264,7 @@ class Chat extends Component {
 
     if (!streamingData && input.trim() !== "") {
       // conversationId = conversationId || this.newConversationId();
-      conversationId = "fgox2wff1707804736774";
+      conversationId = this.guid;
 
       let queryParams = {
         feature: "addin",
@@ -254,10 +273,10 @@ class Chat extends Component {
         app_api_label: "AdhocPrompt",
         mapping_id: 0,
         context: "ALL",
-        conversation_id: "fgox2wff1707804736774",
+        conversation_id: this.guid,
         scrollToBottom: true,
         route: "interaction",
-        chat_request_id: "fgox2wff1707804736780",
+        chat_request_id: this.newConversationId,
       };
 
       if (input === "AddInPrompt") {
@@ -268,17 +287,17 @@ class Chat extends Component {
           app_api_label: "AddInPrompt",
           mapping_id: 11,
           context: "ALL",
-          conversation_id: "fgox2wff1707804736774",
+          conversation_id: this.guid,
           scrollToBottom: true,
           route: "interaction",
-          chat_request_id: "fgox2wff1707804736780",
+          chat_request_id: this.newConversationId,
         };
       }
 
       this.setState({
         messages: [
           // ...conversationId === this.state.conversationId ? messages : [],
-          ...(conversationId === "fgox2wff1707804736774" ? messages : []),
+          ...(conversationId === this.guid ? messages : []),
           {
             message: input,
             user: true,
