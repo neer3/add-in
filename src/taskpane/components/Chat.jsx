@@ -29,8 +29,7 @@ class Chat extends Component {
   }
 
   initWebSocket = () => {
-    let websocketUrl =
-      `wss://alpha.lvh.me:5701/api/v1/chat/${this.guid}/ws?token=Bearer%20eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImFscGhhIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNTEwMDg1MH0.VAAKIKcZJzkurqCqfiMnItEkn1RXSeAdSNhDu5RBFxc`;
+    let websocketUrl = `wss://alpha.lvh.me:5701/api/v1/chat/${this.guid}/ws?token=Bearer%20eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImFscGhhIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNTEwMDg1MH0.VAAKIKcZJzkurqCqfiMnItEkn1RXSeAdSNhDu5RBFxc`;
     return new WebSocket(websocketUrl);
   };
 
@@ -76,14 +75,74 @@ class Chat extends Component {
         if (temp.message.body === "") {
           return;
         }
-        var messagesCopy = this.state.messages;
+        if (temp.message.type === "stop") {
+          var regex = /```json([\s\S]*?)```/g;
+          var match;
+          var jsonObject = {};
+          while ((match = regex.exec(temp.message.body)) !== null) {
+            debugger;
+            var parsedValue = JSON.parse(match[1].trim());
+            Object.keys(parsedValue).map((key) => {
+              jsonObject[key] = {
+                "Proposed Change": parsedValue[key]["Proposed Change"],
+                "Negotiation Recommendation": parsedValue[key]["Negotiation Recommendation"],
+                paragraph_index: parsedValue[key]["paragraph_index"],
+              };
+            });
+          }
 
-        messagesCopy[messagesCopy.length - 1] = event.data;
-        this.setState((prevState) => ({
-          messages: messagesCopy,
-        }));
+          var messagesCompCopy = [];
+          Object.keys(jsonObject).map((key) => {
+            const value = jsonObject[key];
+            messagesCompCopy.push(
+              <div key={key} onClick={() => this.scrollToParagraph(value.paragraph_index)}>
+                <h3>{key}</h3>
+                <p>Proposed Change: {value["Proposed Change"]}</p>
+                <p>Negotiation Recommendation: {value["Negotiation Recommendation"]}</p>
+                <p>Paragraph Index: {value["paragraph_index"]}</p>
+              </div>
+            );
+          });
+
+          var messagesCopy2 = this.state.messages;
+          debugger;
+          messagesCopy2[messagesCopy2.length - 1] = messagesCompCopy;
+          this.setState((prevState) => ({
+            messages: messagesCopy2,
+          }));
+        } else {
+          var messagesCopy = this.state.messages;
+
+          messagesCopy[messagesCopy.length - 1] = event.data;
+          this.setState((prevState) => ({
+            messages: messagesCopy,
+          }));
+        }
       }
     };
+  }
+
+  scrollToParagraph = async (inputValue) => {
+    var regex = /\d+/;
+    inputValue = parseInt(inputValue.match(regex)[0]);
+    debugger;
+    await Word.run(async (context) => {
+      const paragraphs = context.document.body.paragraphs;
+      paragraphs.load("items, count");
+  
+      await context.sync();
+      if (inputValue < 0 || inputValue >= paragraphs.count) {
+        console.error("Invalid paragraph index.");
+        return;
+      }
+  
+      const targetParagraph = paragraphs.items[inputValue];
+      paragraphs.items[inputValue].font.highlightColor = "yellow";
+      targetParagraph.getRange().select();
+      targetParagraph.getRange().scrollIntoView();
+  
+      await context.sync();
+    });
   }
 
   documentToCsv = async () => {
@@ -99,7 +158,7 @@ class Chat extends Component {
       const paragraphs = body.paragraphs;
       paragraphs.load("text");
       await context.sync();
-      for (let i = 0; i < paragraphs.items.length && i < 20; i++) {
+      for (let i = 0; i < paragraphs.items.length && i < 40; i++) {
         let paragraph = paragraphs.items[i];
         let text = paragraph.text;
         text = text.replace(/[^a-zA-Z0-9\s]/g, "");
@@ -126,7 +185,25 @@ class Chat extends Component {
 
         await context.sync();
 
-        current_content = v2.m_value;
+        let csvRows = [];
+        // csvRows.push('"[paragraph index]","[legal text]"');
+        await Word.run(async (context) => {
+          const body = context.document.body;
+          const paragraphs = body.paragraphs;
+          paragraphs.load("text");
+          await context.sync();
+          for (let i = 0; i < paragraphs.items.length && i < 20; i++) {
+            let paragraph = paragraphs.items[i];
+            let text = paragraph.text;
+            text = text.replace(/[^a-zA-Z0-9\s]/g, "");
+            if (text.length > 2) {
+              let csvRow = "paragraph_index_" + i + "::" + text;
+              csvRows.push(csvRow);
+            }
+          }
+        });
+
+        current_content = csvRows.join("\n");
         original_content = v.m_value;
       });
       payload["reportsData"] = {
@@ -134,31 +211,14 @@ class Chat extends Component {
         previous_contract: original_content,
       };
     } else {
-      // var docSelection = "";
-      // await Word.run(async (context) => {
-      //   var selection = context.document.getSelection();
-      //   context.load(selection, "text");
-
-      //   await context.sync();
-
-      //   // setSelectionData(selection.text);
-      //   console.log(selection);
-
-      //   if (selection.text.length === 0) {
-      //     // selection =
-      //     return;
-      //   }
-      //   docSelection = selection.text;
-      // });
-
       let csvRows = [];
-      csvRows.push('"paragraph index","legal text"');
+      csvRows.push('"[paragraph index]","[legal text]"');
       await Word.run(async (context) => {
         const body = context.document.body;
         const paragraphs = body.paragraphs;
         paragraphs.load("text");
         await context.sync();
-        for (let i = 0; i < paragraphs.items.length && i < 10; i++) {
+        for (let i = 0; i < paragraphs.items.length && i < 40; i++) {
           let paragraph = paragraphs.items[i];
           let text = paragraph.text;
           text = text.replace(/[^a-zA-Z0-9\s]/g, "");
@@ -369,25 +429,52 @@ class Chat extends Component {
     }
   };
 
+  parseToHTML = (htmlString) => {
+    var parser = new DOMParser();
+    // Parse the HTML string
+    var parsedHtml = parser.parseFromString(htmlString, "text/html");
+
+    return { __html: parsedHtml.body.innerHTML };
+  };
+
+  renderChatPara = (chat) => {
+    return chat.map((component, index) => <div key={index}>{component}</div>);
+  };
+
   renderConversation = (messages) => {
     let chatItems = [];
     const { streamingData } = this.state;
     // if (!streamingData) {
     //   this.preProcessChatMessages(messages);
     // }
+    // <Markdown remarkPlugins={[remarkGfm]}>
+    // {typeof chat.message == "undefined" ? JSON.parse(chat).message.body : chat.message}
+    // </Markdown>
 
     messages.forEach((chat, i) => {
-      chatItems.push(
-        <div key={i} className="chat">
-          <i className={chat.user ? "icon-user" : "icon-bot"} />
-          <div className={chat.user ? "content user" : "content assistant"}>
-            <Markdown remarkPlugins={[remarkGfm]}>
-              {typeof chat.message == "undefined" ? JSON.parse(chat).message.body : chat.message}
-            </Markdown>
-            {chat.button ? this.renderChatButton(chat) : <></>}
+      if (Array.isArray(chat)) {
+        chatItems.push(
+          <div key={i} className="chat">
+            <i className={chat.user ? "icon-user" : "icon-bot"} />
+            <div className={chat.user ? "content user" : "content assistant"}>
+              {this.renderChatPara(chat)}
+              {chat.button ? this.renderChatButton(chat) : <></>}
+            </div>
           </div>
-        </div>
-      );
+        );
+      } else {
+        chatItems.push(
+          <div key={i} className="chat">
+            <i className={chat.user ? "icon-user" : "icon-bot"} />
+            <div className={chat.user ? "content user" : "content assistant"}>
+              <Markdown remarkPlugins={[remarkGfm]}>
+                {typeof chat.message == "undefined" ? JSON.parse(chat).message.body : chat.message}
+              </Markdown>
+              {chat.button ? this.renderChatButton(chat) : <></>}
+            </div>
+          </div>
+        );
+      }
     });
     return chatItems;
   };
