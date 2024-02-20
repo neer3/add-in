@@ -26,10 +26,11 @@ class Chat extends Component {
     this.lastResponseReceivedTimestamp = Date.now();
     this.socketInitiateTime = Date.now();
     this.guid = `${Math.random().toString(36).substring(2, 10)}${new Date().getTime()}`;
+    this.index=0;
   }
 
   initWebSocket = () => {
-    let websocketUrl = `wss://alpha.lvh.me:5701/api/v1/chat/${this.guid}/ws?token=Bearer%20eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImFscGhhIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNTEwMDg1MH0.VAAKIKcZJzkurqCqfiMnItEkn1RXSeAdSNhDu5RBFxc`;
+    let websocketUrl = `wss://alpha.lvh.me:5700/api/v1/chat/${this.guid}/ws?token=Bearer%20eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImFscGhhIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNTEwMDg1MH0.VAAKIKcZJzkurqCqfiMnItEkn1RXSeAdSNhDu5RBFxc`;
     return new WebSocket(websocketUrl);
   };
 
@@ -95,7 +96,7 @@ class Chat extends Component {
           Object.keys(jsonObject).map((key) => {
             const value = jsonObject[key];
             messagesCompCopy.push(
-              <div key={key} onClick={() => this.scrollToParagraph(value.paragraph_index)}>
+              <div key={key} onClick={() => this.scrollToParagraph(value.paragraph_index)} style={{ cursor: "pointer" }}>
                 <h3>{key}</h3>
                 <p>Proposed Change: {value["Proposed Change"]}</p>
                 <p>Negotiation Recommendation: {value["Negotiation Recommendation"]}</p>
@@ -105,7 +106,6 @@ class Chat extends Component {
           });
 
           var messagesCopy2 = this.state.messages;
-          debugger;
           messagesCopy2[messagesCopy2.length - 1] = messagesCompCopy;
           this.setState((prevState) => ({
             messages: messagesCopy2,
@@ -122,10 +122,24 @@ class Chat extends Component {
     };
   }
 
+  resetHighlight = async() => {
+    await Word.run(async (context) => {
+      const paragraphs = context.document.body.paragraphs;
+      paragraphs.load("items, count");
+  
+      await context.sync();
+      paragraphs.items[this.index].font.highlightColor = "white";
+  
+      await context.sync();
+    });
+  }
+
   scrollToParagraph = async (inputValue) => {
+    this.resetHighlight()
+    
     var regex = /\d+/;
     inputValue = parseInt(inputValue.match(regex)[0]);
-    debugger;
+    this.index=inputValue;
     await Word.run(async (context) => {
       const paragraphs = context.document.body.paragraphs;
       paragraphs.load("items, count");
@@ -145,25 +159,25 @@ class Chat extends Component {
     });
   }
 
-  documentToCsv = async () => {
+  OriginaldocumentToCsv = async () => {
     // if(calledLLM === true){
     //   return;
     // }
 
     // setCalledLLM(true);
     let csvRows = [];
-    csvRows.push('"index","paragraph"');
-    await Word.run(async (context) => {
+     // csvRows.push('"[paragraph index]","[legal text]"');
+     await Word.run(async (context) => {
       const body = context.document.body;
       const paragraphs = body.paragraphs;
       paragraphs.load("text");
       await context.sync();
-      for (let i = 0; i < paragraphs.items.length && i < 40; i++) {
+      for (let i = 0; i < paragraphs.items.length && i < 50; i++) {
         let paragraph = paragraphs.items[i];
         let text = paragraph.text;
         text = text.replace(/[^a-zA-Z0-9\s]/g, "");
         if (text.length > 2) {
-          let csvRow = i + ',"' + text + '"';
+          let csvRow = "paragraph_index_" + i + "::" + text;
           csvRows.push(csvRow);
         }
       }
@@ -176,12 +190,13 @@ class Chat extends Component {
       var current_content = "";
       var original_content = "";
       await Word.run(async (context) => {
-        var selection = context.document.getSelection();
-        context.load(selection, "text");
+        const body = context.document.body;
 
-        var v = selection.getReviewedText(Word.ChangeTrackingVersion.original);
+        body.load("text");
 
-        var v2 = selection.getReviewedText(Word.ChangeTrackingVersion.current);
+        await context.sync();
+
+        var v = body.getReviewedText(Word.ChangeTrackingVersion.original);
 
         await context.sync();
 
@@ -192,7 +207,7 @@ class Chat extends Component {
           const paragraphs = body.paragraphs;
           paragraphs.load("text");
           await context.sync();
-          for (let i = 0; i < paragraphs.items.length && i < 20; i++) {
+          for (let i = 0; i < paragraphs.items.length && i < 50; i++) {
             let paragraph = paragraphs.items[i];
             let text = paragraph.text;
             text = text.replace(/[^a-zA-Z0-9\s]/g, "");
@@ -204,7 +219,7 @@ class Chat extends Component {
         });
 
         current_content = csvRows.join("\n");
-        original_content = v.m_value;
+        original_content = v.value.substring(0, 1500);
       });
       payload["reportsData"] = {
         latest_contract: current_content,
@@ -236,7 +251,7 @@ class Chat extends Component {
       }
     }
 
-    var baseUrl = `https://alpha.lvh.me:5701/api/v1/reports_chat/${this.guid}/interaction`;
+    var baseUrl = `https://alpha.lvh.me:5700/api/v1/reports_chat/${this.guid}/interaction`;
     try {
       fetch(baseUrl, {
         method: "POST",
