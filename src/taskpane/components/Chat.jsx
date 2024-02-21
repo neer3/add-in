@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Form } from "semantic-ui-react";
+import { Form, Button } from "semantic-ui-react";
 import "./Bot.css";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -134,11 +134,10 @@ class Chat extends Component {
     });
   }
 
-  scrollToParagraph = async (inputValue) => {
-    this.resetHighlight()
-    
+  scrollToParagraph = async (inputValue) => {    
     var regex = /\d+/;
     inputValue = parseInt(inputValue.match(regex)[0]);
+    this.resetHighlight()
     this.index=inputValue;
     await Word.run(async (context) => {
       const paragraphs = context.document.body.paragraphs;
@@ -333,29 +332,17 @@ class Chat extends Component {
   };
 
   handleSendMessage = () => {
-    const { input, streamingData, messages } = this.state;
+    const { streamingData, messages } = this.state;
     const { reportsData, exportPayload } = this.props;
     let { conversationId } = this.state;
+
+    let input= "AddInPrompt" ;
 
     if (!streamingData && input.trim() !== "") {
       // conversationId = conversationId || this.newConversationId();
       conversationId = this.guid;
 
-      let queryParams = {
-        feature: "addin",
-        question_content: this.state.input,
-        prompt_api_label: "AdhocPrompt",
-        app_api_label: "AdhocPrompt",
-        mapping_id: 0,
-        context: "ALL",
-        conversation_id: this.guid,
-        scrollToBottom: true,
-        route: "interaction",
-        chat_request_id: this.newConversationId,
-      };
-
-      if (input === "AddInPrompt") {
-        queryParams = {
+      let  queryParams = {
           feature: "addin",
           question_content: "",
           prompt_api_label: "AddInSuggestions",
@@ -366,8 +353,9 @@ class Chat extends Component {
           scrollToBottom: true,
           route: "interaction",
           chat_request_id: this.newConversationId,
+          play_book_id: parseInt(this.state.playBookId),
         };
-      }
+      
 
       this.setState({
         messages: [
@@ -494,6 +482,29 @@ class Chat extends Component {
     return chatItems;
   };
 
+  fetchStandardPrompts = () => {        
+    const url = "/api/v1/prompts/reports";
+    fetchGet(url, GEN_AI_API_SERVICE)
+      .then((response) => response.json())
+      .then((data) => {
+        this.setState({
+          standardPrompts: data.data.prompts,
+          streamingData: false,
+          chatInProgress: false
+        });
+      })
+      .catch(() => {
+        this.setState((prevState) => ({
+          messages: [
+            ...prevState.messages,
+            this.createMessageHash("***\n\nError: Fetching standard prompts\n\n***", "stream")
+          ],
+          streamingData: false,
+          chatInProgress: false
+        }));
+      });
+  };
+
   handleStandardPromptClick = (prompt) => {
     const { reportsData, exportPayload } = this.props;
 
@@ -550,11 +561,24 @@ class Chat extends Component {
   };
 
   render() {
-    const { messages, input, streamingData, establishingSocketconnection, standardPrompts, analyseData } = this.state;
+    const { messages, input, streamingData, establishingSocketconnection, standardPrompts, playBookId, analyseData } = this.state;
+
+    // this.setState({ input: "AddInPrompt" });
+
+    const handleSelectChange = (e) => {
+      this.setState({ playBookId: e.target.value });
+    };
 
     return (
       <div className="chatbot-container">
         <div className="header">GenAI Assist</div>
+        <div>
+        <select id="dropdown" value={playBookId} onChange={handleSelectChange}>
+          <option value="">--Please choose an playbook--</option>
+          <option value="1">Customer Negotiation Playbook</option>
+          <option value="2"></option>
+        </select>
+      </div>
         <div className="body markdown-body" id="contract-chat">
           <div className="chat-list" id="chat-list">
             {this.renderConversation(messages)}
@@ -565,7 +589,15 @@ class Chat extends Component {
           <div className="quick-actins">{this.renderPrompts(standardPrompts)}</div>
           <Form className="chat-form" autoComplete="off">
             <Form.Field className="editor-field">
-              <textarea
+            <Button
+            key={1}
+            className="ui button quick-actins-button"
+            onClick={()=>this.handleSendMessage()}
+            disabled={this.state.streamingData || this.state.wsInactive}
+          >
+            Give Recommendation
+          </Button>
+              {/* <textarea
                 onChange={(e) => {
                   this.setState({ input: e.target.value });
                 }}
@@ -584,7 +616,7 @@ class Chat extends Component {
                 type="text"
                 value={input}
                 disabled={streamingData || establishingSocketconnection}
-              />
+              /> */}
               <div className="chat-action-icons">
                 {streamingData || establishingSocketconnection ? (
                   <span className="loading-dots">
