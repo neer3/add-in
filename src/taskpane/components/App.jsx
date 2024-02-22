@@ -16,6 +16,8 @@ import GenAi from "./GenAi";
 import Gamma from "./Gamma";
 import AuthPage from "./Auth";
 import Chat from "./Chat";
+import SaveFile from "./SaveFile";
+import KeyProvision from "./KeyProvision";
 // import TextChat from "./TextChat";
 
 const useStyles = makeStyles({
@@ -98,11 +100,17 @@ const App = (props) => {
           <div><h5>The word document can Exported at the end. Have option to export with or without red lined changes.</h5></div>
           <div><TextChat/></div>
         </Accordion> */}
+        <Accordion title="Version Control">
+          <SaveFile/>
+        </Accordion>
         <Accordion title="GenAI">
           <GenAi/>
         </Accordion>
         <Accordion title="Adhoc">
           <Chat/>
+        </Accordion>
+        <Accordion title="Standard Prompts">
+          <KeyProvision/>
         </Accordion>
         {/* <Accordion title="Gamma">
           <Gamma/>
