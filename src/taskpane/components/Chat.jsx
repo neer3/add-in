@@ -27,6 +27,7 @@ class Chat extends Component {
     this.socketInitiateTime = Date.now();
     this.guid = `${Math.random().toString(36).substring(2, 10)}${new Date().getTime()}`;
     this.index=0;
+    this.playBookId=0
   }
 
   initWebSocket = () => {
@@ -95,8 +96,8 @@ class Chat extends Component {
           Object.keys(jsonObject).map((key) => {
             const value = jsonObject[key];
             messagesCompCopy.push(
-              <div key={key} onClick={() => this.scrollToParagraph(value.paragraph_index)} style={{ cursor: "pointer" }}>
-                <h3>{key}</h3>
+              <div key={key} onClick={() => this.scrollToParagraph(value.paragraph_index, value["Proposed Change"])} style={{ cursor: "pointer" }}>
+                 <h3 style={{ color: "blue" }}>{key}</h3>
                 <p>Proposed Change: {value["Proposed Change"]}</p>
                 <p>Negotiation Recommendation: {value["Negotiation Recommendation"]}</p>
                 <p>Paragraph Index: {value["paragraph_index"]}</p>
@@ -134,7 +135,7 @@ class Chat extends Component {
             const value = jsonObject[key];
             messagesCompCopy.push(
               <div key={key} onClick={() => this.scrollToParagraph(value.paragraph_index)} style={{ cursor: "pointer" }}>
-                <h3>{key}</h3>
+                <h3 style={{ color: "blue" }}>{key}</h3>
                 <p>Paragraph Index: {value["paragraph_index"]}</p>
                 <p>Effective Term: {value["EffectiveTerm"]}</p>
                 <p>Playbook Guidance:</p>
@@ -175,7 +176,7 @@ class Chat extends Component {
     });
   }
 
-  scrollToParagraph = async (inputValue) => {    
+  scrollToParagraph = async (inputValue, text) => {    
     var regex = /\d+/;
     inputValue = parseInt(inputValue.match(regex)[0]);
     this.resetHighlight()
@@ -192,6 +193,10 @@ class Chat extends Component {
   
       const targetParagraph = paragraphs.items[inputValue];
       paragraphs.items[inputValue].font.highlightColor = "yellow";
+      // if (this.state.playBookId=='1'){
+        paragraphs.items[inputValue].insertText(text, Word.InsertLocation.replace);
+      // }
+      
       targetParagraph.getRange().select();
       targetParagraph.getRange().scrollIntoView();
   
