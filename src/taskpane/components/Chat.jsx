@@ -76,12 +76,11 @@ class Chat extends Component {
         if (temp.message.body === "") {
           return;
         }
-        if (temp.message.type === "stop") {
+        if (temp.message.type === "stop" && this.state.playBookId=='1') {
           var regex = /```json([\s\S]*?)```/g;
           var match;
           var jsonObject = {};
           while ((match = regex.exec(temp.message.body)) !== null) {
-            debugger;
             var parsedValue = JSON.parse(match[1].trim());
             Object.keys(parsedValue).map((key) => {
               jsonObject[key] = {
@@ -110,6 +109,48 @@ class Chat extends Component {
           this.setState((prevState) => ({
             messages: messagesCopy2,
           }));
+        } else if (temp.message.type === "stop" && this.state.playBookId == '2') {
+          var regex = /```json([\s\S]*?)```/g;
+          var match;
+          var jsonObject = {};
+          while ((match = regex.exec(temp.message.body)) !== null) {
+            var parsedValue = JSON.parse(match[1].trim());
+            Object.keys(parsedValue).map((key) => {
+              jsonObject[key] = {
+                "paragraph_index": parsedValue[key]["paragraph_index"],
+                "EffectiveTerm": parsedValue[key]["EffectiveTerm"],
+                "PlaybookGuidance": {
+                  "ComplianceAssessment": parsedValue[key]["PlaybookGuidance"]["ComplianceAssessment"],
+                  "OurPosition": parsedValue[key]["PlaybookGuidance"]["OurPosition"],
+                  "ExpectedPushbackAndOurResponse": parsedValue[key]["PlaybookGuidance"]["ExpectedPushbackAndOurResponse"],
+                  "BottomLine": parsedValue[key]["PlaybookGuidance"]["BottomLine"]
+                },
+              };
+            });
+          }
+        
+          var messagesCompCopy = [];
+          Object.keys(jsonObject).map((key) => {
+            const value = jsonObject[key];
+            messagesCompCopy.push(
+              <div key={key} onClick={() => this.scrollToParagraph(value.paragraph_index)} style={{ cursor: "pointer" }}>
+                <h3>{key}</h3>
+                <p>Paragraph Index: {value["paragraph_index"]}</p>
+                <p>Effective Term: {value["EffectiveTerm"]}</p>
+                <p>Playbook Guidance:</p>
+                <ul>
+                  <li>Compliance Assessment: {value["PlaybookGuidance"]["ComplianceAssessment"]}</li>
+                  <li>Our Position: {value["PlaybookGuidance"]["OurPosition"]}</li>
+                  <li>Expected Pushback and Our Response: {value["PlaybookGuidance"]["ExpectedPushbackAndOurResponse"]}</li>
+                  <li>Bottom Line: {value["PlaybookGuidance"]["BottomLine"]}</li>
+                </ul>
+              </div>
+            );
+          });
+        
+          var messagesCopy2 = [...this.state.messages];
+          messagesCopy2[messagesCopy2.length - 1] = messagesCompCopy;
+          this.setState({ messages: messagesCopy2 });
         } else {
           var messagesCopy = this.state.messages;
 
@@ -185,7 +226,7 @@ class Chat extends Component {
   };
 
   startInteract = async (payload) => {
-    if (payload.prompt_api_label === "AddInSuggestions") {
+    if (payload.prompt_api_label === "AddInSuggestions" || payload.prompt_api_label ==="AccountReviewNegotiationGuidance") {
       var current_content = "";
       var original_content = "";
       await Word.run(async (context) => {
@@ -336,13 +377,15 @@ class Chat extends Component {
     const { reportsData, exportPayload } = this.props;
     let { conversationId } = this.state;
 
-    let input= "AddInPrompt" ;
 
-    if (!streamingData && input.trim() !== "") {
+    
+
+    if (!streamingData) {
       // conversationId = conversationId || this.newConversationId();
       conversationId = this.guid;
-
-      let  queryParams = {
+      if (this.state.playBookId==1){
+        var input= "AddInPrompt" ;
+        var  queryParams = {
           feature: "addin",
           question_content: "",
           prompt_api_label: "AddInSuggestions",
@@ -355,6 +398,22 @@ class Chat extends Component {
           chat_request_id: this.newConversationId,
           play_book_id: parseInt(this.state.playBookId),
         };
+      } else if(this.state.playBookId==2){
+        var input= "AddInPrompt" ;
+        var queryParams = {
+          feature: "addin",
+          question_content: "",
+          prompt_api_label: "AccountReviewNegotiationGuidance",
+          app_api_label: "GetNegotiationGuidance",
+          mapping_id: 12,
+          context: "ALL",
+          conversation_id: this.guid,
+          scrollToBottom: true,
+          route: "interaction",
+          chat_request_id: this.newConversationId,
+          play_book_id: parseInt(this.state.playBookId),
+        };
+      }
       
 
       this.setState({
@@ -569,6 +628,44 @@ class Chat extends Component {
       this.setState({ playBookId: e.target.value });
     };
 
+    let button;
+  if (playBookId == 1) {
+    button = (
+      <Button
+        key={1}
+        className="ui button quick-actions-button"
+        onClick={() => this.handleSendMessage()}
+        disabled={this.state.streamingData || this.state.wsInactive}
+      >
+        Give Recommendation
+      </Button>
+    );
+  } else if (playBookId == 2) {
+    button = (
+      <Button
+        key={2}
+        className="ui button other-button-class"
+        onClick={() => this.handleSendMessage()}
+        disabled={this.state.streamingData || this.state.wsInactive}
+      >
+        Get Guidelines
+      </Button>
+    );
+  }
+  // } else {
+  //   // Default button if playbookId is neither 1 nor 2
+  //   button = (
+  //     <Button
+  //       key={3}
+  //       className="ui button default-button-class"
+  //       onClick={() => this.handleDefaultAction()}
+  //       disabled={this.state.streamingData || this.state.wsInactive}
+  //     >
+  //       Default Action
+  //     </Button>
+  //   );
+  // }
+
     return (
       <div className="chatbot-container">
         <div className="header">GenAI Assist</div>
@@ -576,7 +673,7 @@ class Chat extends Component {
         <select id="dropdown" value={playBookId} onChange={handleSelectChange}>
           <option value="">--Please choose an playbook--</option>
           <option value="1">Customer Negotiation Playbook</option>
-          <option value="2"></option>
+          <option value="2">Negotiation Playbook</option>
         </select>
       </div>
         <div className="body markdown-body" id="contract-chat">
@@ -589,14 +686,8 @@ class Chat extends Component {
           <div className="quick-actins">{this.renderPrompts(standardPrompts)}</div>
           <Form className="chat-form" autoComplete="off">
             <Form.Field className="editor-field">
-            <Button
-            key={1}
-            className="ui button quick-actins-button"
-            onClick={()=>this.handleSendMessage()}
-            disabled={this.state.streamingData || this.state.wsInactive}
-          >
-            Give Recommendation
-          </Button>
+            
+            {button}
               {/* <textarea
                 onChange={(e) => {
                   this.setState({ input: e.target.value });
