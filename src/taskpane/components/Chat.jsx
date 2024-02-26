@@ -97,10 +97,15 @@ class Chat extends Component {
             const value = jsonObject[key];
             messagesCompCopy.push(
               <div key={key} onClick={() => this.scrollToParagraph(value.paragraph_index, value["Proposed Change"])} style={{ cursor: "pointer" }}>
-                 <h3 style={{ color: "blue" }}>{key}</h3>
+                 <h3 style={{ color: "blue" }}><u>{key}</u></h3>
+                 {Number.isInteger(parseInt(value.paragraph_index)) && (
+                  <div>
+                    <button onClick={() => this.handleReplace(value.paragraph_index, value["Proposed Change"])}>Replace</button>
+                    <p>Paragraph Index: {value["paragraph_index"]}</p>
+                  </div>
+                )}
                 <p>Proposed Change: {value["Proposed Change"]}</p>
                 <p>Negotiation Recommendation: {value["Negotiation Recommendation"]}</p>
-                <p>Paragraph Index: {value["paragraph_index"]}</p>
               </div>
             );
           });
@@ -135,7 +140,7 @@ class Chat extends Component {
             const value = jsonObject[key];
             messagesCompCopy.push(
               <div key={key} onClick={() => this.scrollToParagraph(value.paragraph_index)} style={{ cursor: "pointer" }}>
-                <h3 style={{ color: "blue" }}>{key}</h3>
+                <h3 style={{ color: "blue" }}><u>{key}</u></h3>
                 <p>Paragraph Index: {value["paragraph_index"]}</p>
                 <p>Effective Term: {value["EffectiveTerm"]}</p>
                 <p>Playbook Guidance:</p>
@@ -204,6 +209,29 @@ class Chat extends Component {
     });
   }
 
+  handleReplace = async (inputValue, text) => {    
+    var regex = /\d+/;
+    inputValue = parseInt(inputValue.match(regex)[0]);
+    this.resetHighlight()
+    this.index=inputValue;
+    await Word.run(async (context) => {
+      const paragraphs = context.document.body.paragraphs;
+      paragraphs.load("items, count");
+  
+      await context.sync();
+      if (inputValue < 0 || inputValue >= paragraphs.count) {
+        console.error("Invalid paragraph index.");
+        return;
+      }
+
+      paragraphs.items[inputValue].font.highlightColor = "white";
+      
+      paragraphs.items[inputValue].insertText(text, Word.InsertLocation.replace);
+  
+      await context.sync();
+    });
+  }
+
   OriginaldocumentToCsv = async () => {
     // if(calledLLM === true){
     //   return;
@@ -218,8 +246,14 @@ class Chat extends Component {
       paragraphs.load("text");
       await context.sync();
       for (let i = 0; i < paragraphs.items.length && i < 50; i++) {
-        let paragraph = paragraphs.items[i];
-        let text = paragraph.text;
+        let paragraphWithHiddenText= paragraphs.items[i].getText(
+            {
+              IncludeHiddenText: false,
+              IncludeTextMarkedAsDeleted: false,
+          }
+          );
+        await context.sync();
+        text+= paragraphWithHiddenText.value;
         text = text.replace(/[^a-zA-Z0-9\s]/g, "");
         if (text.length > 2) {
           let csvRow = "paragraph_index_" + i + "::" + text;
@@ -253,8 +287,14 @@ class Chat extends Component {
           paragraphs.load("text");
           await context.sync();
           for (let i = 0; i < paragraphs.items.length && i < 50; i++) {
-            let paragraph = paragraphs.items[i];
-            let text = paragraph.text;
+            let paragraphWithHiddenText= paragraphs.items[i].getText(
+                {
+                  IncludeHiddenText: false,
+                  IncludeTextMarkedAsDeleted: false,
+              }
+              );
+            await context.sync();
+            let text = paragraphWithHiddenText.value;
             text = text.replace(/[^a-zA-Z0-9\s]/g, "");
             if (text.length > 2) {
               let csvRow = "paragraph_index_" + i + "::" + text;
@@ -381,10 +421,7 @@ class Chat extends Component {
     const { streamingData, messages } = this.state;
     const { reportsData, exportPayload } = this.props;
     let { conversationId } = this.state;
-
-
-    
-
+    debugger;
     if (!streamingData) {
       // conversationId = conversationId || this.newConversationId();
       conversationId = this.guid;
