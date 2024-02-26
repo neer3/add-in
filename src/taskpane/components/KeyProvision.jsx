@@ -93,22 +93,26 @@ class KeyProvision extends Component {
           //;
           // here you need to add the comments
           Object.keys(jsonObject).map((key) => {
-            this.addCommentsPara(key, jsonObject[key].paragraph_index);
+            if (jsonObject[key].paragraph_index.length > 0) {
+              this.addCommentsPara(key, jsonObject[key].paragraph_index);
+            }
           });
           //;
           var messagesCompCopy = [];
           Object.keys(jsonObject).map((key) => {
             const value = jsonObject[key];
-            messagesCompCopy.push(
-              <div
-                key={key}
-                onClick={() => this.scrollToParagraph(value.paragraph_index)}
-                style={{ cursor: "pointer" }}
-              >
-                <h3>{key}</h3>
-                <p>Summary: {value["summary"]}</p>
-              </div>
-            );
+            if (value.paragraph_index.length > 0) {
+              messagesCompCopy.push(
+                <div
+                  key={key}
+                  onClick={() => this.scrollToParagraph(value.paragraph_index)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <h3>{key}</h3>
+                  <p>Summary: {value["summary"]}</p>
+                </div>
+              );
+            }
           });
 
           var messagesCopy2 = this.state.messages;
@@ -366,6 +370,70 @@ class KeyProvision extends Component {
     }
   };
 
+  handleSendMessage2 = () => {
+    const { input, streamingData, messages } = this.state;
+    const { reportsData, exportPayload } = this.props;
+    let { conversationId } = this.state;
+
+    if (!streamingData) {
+      // conversationId = conversationId || this.newConversationId();
+      conversationId = this.guid;
+
+      let queryParams = {
+        feature: "addin",
+        question_content: this.state.input,
+        prompt_api_label: "SummarizeKeyProvisions",
+        app_api_label: "SummarizeKeyProvisions",
+        mapping_id: 0,
+        context: "ALL",
+        conversation_id: this.guid,
+        scrollToBottom: true,
+        route: "interaction",
+        chat_request_id: this.newConversationId,
+      };
+
+      // eslint-disable-next-line no-constant-condition
+      if (input === "AddInPrompt" || true) {
+        queryParams = {
+          feature: "addin",
+          question_content: "",
+          prompt_api_label: "SummarizeKeyProvisions",
+          app_api_label: "SummarizeKeyProvisions",
+          mapping_id: 13, //here
+          context: "ALL",
+          conversation_id: this.guid,
+          scrollToBottom: true,
+          route: "interaction",
+          chat_request_id: this.newConversationId,
+        };
+      }
+
+      this.setState({
+        messages: [
+          // ...conversationId === this.state.conversationId ? messages : [],
+          ...(conversationId === this.guid ? messages : []),
+          {
+            message: input,
+            user: true,
+            type: "question",
+            messsageChunks: [{ text: input, index: 0 }],
+          },
+          {
+            message: "Processing ...",
+            user: false,
+            type: "in-progress",
+            messsageChunks: [{ text: "Processing ...", index: 0 }],
+          },
+        ],
+        streamingData: true,
+        input: "",
+        conversationId,
+      });
+      setTimeout(this.scrollToBottom, 100);
+      setTimeout(this.startInteract, 3000, queryParams);
+    }
+  };
+
   textParser = (text) => {
     let tableLines = null;
     text.split("\n").forEach((line) => {
@@ -512,7 +580,9 @@ class KeyProvision extends Component {
 
         <div className="new-chat">
           <div className="quick-actins">{this.renderPrompts(standardPrompts)}</div>
-          <button onClick={this.handleSendMessage}>Key Provisions</button>
+          <button onClick={this.handleSendMessage}>All Key Provisions</button>
+          <br />
+          <button onClick={this.handleSendMessage2}>Limited Key Provisions</button>
         </div>
       </div>
     );
