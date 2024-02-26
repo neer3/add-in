@@ -97,15 +97,15 @@ class Chat extends Component {
             const value = jsonObject[key];
             messagesCompCopy.push(
               <div key={key} onClick={() => this.scrollToParagraph(value.paragraph_index, value["Proposed Change"])} style={{ cursor: "pointer" }}>
-                 <h3 style={{ color: "blue" }}><u>{key}</u></h3>
                  {Number.isInteger(parseInt(value.paragraph_index)) && (
                   <div>
+                  <h3 style={{ color: "blue" }}><u>{key}</u></h3>
                     <button onClick={() => this.handleReplace(value.paragraph_index, value["Proposed Change"])}>Replace</button>
                     <p>Paragraph Index: {value["paragraph_index"]}</p>
+                    <p>Proposed Change: {value["Proposed Change"]}</p>
+                <p>Negotiation Recommendation: {value["Negotiation Recommendation"]}</p>
                   </div>
                 )}
-                <p>Proposed Change: {value["Proposed Change"]}</p>
-                <p>Negotiation Recommendation: {value["Negotiation Recommendation"]}</p>
               </div>
             );
           });
@@ -140,16 +140,21 @@ class Chat extends Component {
             const value = jsonObject[key];
             messagesCompCopy.push(
               <div key={key} onClick={() => this.scrollToParagraph(value.paragraph_index)} style={{ cursor: "pointer" }}>
-                <h3 style={{ color: "blue" }}><u>{key}</u></h3>
-                <p>Paragraph Index: {value["paragraph_index"]}</p>
-                <p>Effective Term: {value["EffectiveTerm"]}</p>
-                <p>Playbook Guidance:</p>
-                <ul>
-                  <li>Compliance Assessment: {value["PlaybookGuidance"]["ComplianceAssessment"]}</li>
-                  <li>Our Position: {value["PlaybookGuidance"]["OurPosition"]}</li>
-                  <li>Expected Pushback and Our Response: {value["PlaybookGuidance"]["ExpectedPushbackAndOurResponse"]}</li>
-                  <li>Bottom Line: {value["PlaybookGuidance"]["BottomLine"]}</li>
-                </ul>
+                {Number.isInteger(parseInt(value.paragraph_index)) && (
+                  <div>
+                    <h3 style={{ color: "blue" }}><u>{key}</u></h3>
+                    <p>Paragraph Index: {value["paragraph_index"]}</p>
+                    <p>Effective Term: {value["EffectiveTerm"]}</p>
+                    <p>Playbook Guidance:</p>
+                    <ul>
+                      <li>Compliance Assessment: {value["PlaybookGuidance"]["ComplianceAssessment"]}</li>
+                      <li>Our Position: {value["PlaybookGuidance"]["OurPosition"]}</li>
+                      <li>Expected Pushback and Our Response: {value["PlaybookGuidance"]["ExpectedPushbackAndOurResponse"]}</li>
+                      <li>Bottom Line: {value["PlaybookGuidance"]["BottomLine"]}</li>
+                    </ul>
+                  </div>
+                )}
+                
               </div>
             );
           });
@@ -198,9 +203,6 @@ class Chat extends Component {
   
       const targetParagraph = paragraphs.items[inputValue];
       paragraphs.items[inputValue].font.highlightColor = "yellow";
-      // if (this.state.playBookId=='1'){
-        paragraphs.items[inputValue].insertText(text, Word.InsertLocation.replace);
-      // }
       
       targetParagraph.getRange().select();
       targetParagraph.getRange().scrollIntoView();
