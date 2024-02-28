@@ -30,7 +30,8 @@ class KeyProvision extends Component {
   }
 
   initWebSocket = () => {
-    let websocketUrl = `wss://alpha.lvh.me:5701/api/v1/chat/${this.guid}/ws?token=Bearer%20eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImFscGhhIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNTEwMDg1MH0.VAAKIKcZJzkurqCqfiMnItEkn1RXSeAdSNhDu5RBFxc`;
+    // let websocketUrl = `wss://alpha.lvh.me:5701/api/v1/chat/${this.guid}/ws?token=Bearer%20eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImFscGhhIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNTEwMDg1MH0.VAAKIKcZJzkurqCqfiMnItEkn1RXSeAdSNhDu5RBFxc`;
+    let websocketUrl = `wss://gamma-dev.pramata.com/gen-ai-api/api/v1/chat/${this.guid}/ws?token=Bearer%20eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImdhbW1hIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNjMxMTA2NX0.OZM6Gk5xsNLjqMc8zE86tEZfUg2KLvyWuxjDDGxiTRw`;
     return new WebSocket(websocketUrl);
   };
 
@@ -246,12 +247,12 @@ class KeyProvision extends Component {
       }
     }
 
-    var baseUrl = `https://alpha.lvh.me:5701/api/v1/reports_chat/${this.guid}/interaction`;
+    var baseUrl = `https://gamma-dev.pramata.com/gen-ai-api/api/v1/reports_chat/${this.guid}/interaction`;
     try {
       fetch(baseUrl, {
         method: "POST",
         headers: {
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImFscGhhIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNTEwMDg1MH0.VAAKIKcZJzkurqCqfiMnItEkn1RXSeAdSNhDu5RBFxc`,
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImdhbW1hIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNjMxMTA2NX0.OZM6Gk5xsNLjqMc8zE86tEZfUg2KLvyWuxjDDGxiTRw`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
