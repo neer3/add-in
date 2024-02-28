@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Form } from "semantic-ui-react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { PramataSetting } from "./Token";
 
 class KeyProvision extends Component {
   constructor(props) {
@@ -134,8 +135,8 @@ class KeyProvision extends Component {
 
   addCommentsPara = async (commentValue, inputValue) => {
     var regex = /\d+/;
-    var start_para = parseInt(inputValue[0].match(regex)[0]);
-    var end_para = parseInt(inputValue[inputValue.length - 1].match(regex)[0]);
+    var start_para = parseInt(inputValue[0].toString().match(regex)[0]);
+    var end_para = parseInt(inputValue[inputValue.length - 1].toString().match(regex)[0]);
 
     await Word.run(async (context) => {
       const body = context.document.body;
@@ -170,8 +171,8 @@ class KeyProvision extends Component {
     this.resetHighlight();
 
     var regex = /\d+/;
-    var start_para = parseInt(inputValue[0].match(regex)[0]);
-    var end_para = parseInt(inputValue[inputValue.length - 1].match(regex)[0]);
+    var start_para = parseInt(inputValue[0].toString().match(regex)[0]);
+    var end_para = parseInt(inputValue[inputValue.length - 1].toString().match(regex)[0]);
     this.index = start_para;
     await Word.run(async (context) => {
       const paragraphs = context.document.body.paragraphs;
@@ -197,7 +198,7 @@ class KeyProvision extends Component {
 
   startInteract = async (payload) => {
     if (payload.prompt_api_label === "AddInSuggestions" || true) {
-      let csvRows = [];
+      let csvRows = {};
       // csvRows.push('"[paragraph index]","[legal text]"');
       await Word.run(async (context) => {
         const body = context.document.body;
@@ -209,14 +210,15 @@ class KeyProvision extends Component {
           let text = paragraph.text;
           text = text.replace(/[^a-zA-Z0-9\s]/g, "");
           if (text.length > 2) {
-            let csvRow = "paragraph_index_" + i + "::" + text;
-            csvRows.push(csvRow);
+            // let csvRow = "paragraph_index_" + i + "::" + text;
+            // csvRows.push(csvRow);
+            csvRows[`paragraph_index_${i}`] = text;
           }
         }
       });
 
       payload["reportsData"] = {
-        latest_contract: csvRows.join("\n"),
+        latest_contract: csvRows,
       };
     } else {
       let csvRows = [];
@@ -371,6 +373,12 @@ class KeyProvision extends Component {
   };
 
   handleSendMessage2 = () => {
+    // try {
+    //   var t = PramataSetting.authToken();
+    // } catch (e) {
+    //   debugger;
+    // }
+    // debugger;
     const { input, streamingData, messages } = this.state;
     const { reportsData, exportPayload } = this.props;
     let { conversationId } = this.state;

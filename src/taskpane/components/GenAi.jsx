@@ -86,7 +86,7 @@ const GenAi = () => {
       }
 
       const token =
-      "";
+      "eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImFscGhhIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNTM0NTk0OX0.miS6p5sMJreMpllsQa0iADbw2KYZ8In1rl9Ga6o7qFA";
       const baseUrl = "https://alpha.lvh.me:5400/api/v1/usage_metrics/gen_ai_suggestion";
 
       var bodyParams = {
@@ -142,7 +142,7 @@ const GenAi = () => {
     let csvString = csvRows.join("\n");
 
     const token =
-      "";
+      "eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InRlbmFudCI6ImFscGhhIiwidXNlcm5hbWUiOiJsNXVscG04ZmMzMDYiLCJlbWFpbCI6Im5lZXJhai5zaW5naEBwcmFtYXRhLmNvbSIsInNob3dfdW5wdWJsaXNoZWRfZGF0YSI6dHJ1ZX0sImV4cCI6MTcyNTM0NTk0OX0.miS6p5sMJreMpllsQa0iADbw2KYZ8In1rl9Ga6o7qFA";
     const baseUrl = "https://alpha.lvh.me:5400/api/v1/usage_metrics/gen_ai_test";
 
     var bodyParams = {

@@ -32,12 +32,14 @@ const App = (props) => {
 
   useEffect(() => {
     const cookies = document.cookie;
-    const jwtToken = cookies.split(';').find(cookie => cookie.trim().startsWith('pramata_add_in_jwt_token='));
+    const jwtToken = cookies.split(';').find(cookie => cookie.trim().startsWith('voyager_container_session_id='));
+    debugger;
+    // setAuthenticated(true);
     if (jwtToken){
       const token = jwtToken.split('=')
-      // const jwtToken = Office.context.document.settings.get('pramata_add_in_jwt_token');
+      // const jwtToken = Office.context.document.settings.get('voyager_container_session_id');
   
-      if (token[1]=='some_random_token') {
+      if (token[1].length > 1) {
         setAuthenticated(true);
       } else {
         setAuthenticated(false);
