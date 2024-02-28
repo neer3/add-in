@@ -31,20 +31,25 @@ const App = (props) => {
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    const cookies = document.cookie;
-    const jwtToken = cookies.split(';').find(cookie => cookie.trim().startsWith('voyager_container_session_id='));
-    debugger;
-    // setAuthenticated(true);
-    if (jwtToken){
-      const token = jwtToken.split('=')
-      // const jwtToken = Office.context.document.settings.get('voyager_container_session_id');
-  
-      if (token[1].length > 1) {
-        setAuthenticated(true);
-      } else {
-        setAuthenticated(false);
-        console.log('Authentication failed!');
-      }
+    // const cookies = document.cookie;
+    let valid_user=false;
+    // TODO
+    fetch(`https://gamma-dev.pramata.com/gen-ai-api/auth/token?allow_unpublished=false`, {
+      method: "GET",
+      credentials: "include",
+    })
+      .then((resp) => {
+        if (resp.status === 200) {
+          valid_user=true;
+        }
+      })
+      
+    // const jwtToken = cookies.split(";").find((cookie) => cookie.trim().startsWith("voyager_container_session_id="));
+    if (valid_user) {
+      props.setAuthenticated(true);
+    } else {
+      props.setAuthenticated(false);
+      console.log("Authentication failed!");
     }
    
   }, []);

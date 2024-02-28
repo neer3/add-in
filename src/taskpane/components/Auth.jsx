@@ -5,24 +5,29 @@ import App from "./App";
 
 const AuthPage = (props) => {
   const processMessage = (arg) => {
-    debugger;
-    document.cookie = `voyager_container_session_id=${arg.message}; SameSite=None; Secure; expires=${new Date(Date.now() + 86400e3).toUTCString()}; path=/`;
-    debugger;
+    // document.cookie = `voyager_container_session_id=${arg.message}; SameSite=None; Secure; expires=${new Date(Date.now() + 86400e3).toUTCString()}; path=/`;
     
-    const cookies = document.cookie;
-
-    const jwtToken = cookies.split(";").find((cookie) => cookie.trim().startsWith("voyager_container_session_id="));
-    if (jwtToken) {
-      const token = jwtToken.split("=");
-      // const jwtToken = Office.context.document.settings.get('voyager_container_session_id');
-      debugger;
-      if (token[1].length > 1) {
-        props.setAuthenticated(true);
-      } else {
-        props.setAuthenticated(false);
-        console.log("Authentication failed!");
-      }
+    // const cookies = document.cookie;
+    let valid_user=false;
+    // TODO
+    fetch(`https://gamma-dev.pramata.com/gen-ai-api/auth/token?allow_unpublished=false`, {
+      method: "GET",
+      credentials: "include",
+    })
+      .then((resp) => {
+        if (resp.status === 200) {
+          valid_user=true;
+        }
+      })
+      
+    // const jwtToken = cookies.split(";").find((cookie) => cookie.trim().startsWith("voyager_container_session_id="));
+    if (valid_user) {
+      props.setAuthenticated(true);
+    } else {
+      props.setAuthenticated(false);
+      console.log("Authentication failed!");
     }
+    
   };
 
   const handleLogin = async () => {
