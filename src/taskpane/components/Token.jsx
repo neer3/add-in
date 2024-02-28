@@ -5,7 +5,7 @@ export class PramataSetting {
     let cookies = document.cookie.split(';').map(cookie => cookie.trim());
     let session_id = cookies.find(cookie => cookie.startsWith('voyager_container_session_id='));
     debugger;
-    fetch(`https://alpha.lvh.me:4100/api/gen-ai-api/auth/token?allow_unpublished=false`, {
+    fetch(`https://gamma-dev.pramata.com/gen-ai-api/auth/token?allow_unpublished=false`, {
       method: "GET",
       credentials: "include",
     })
