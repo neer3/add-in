@@ -29,7 +29,7 @@ const AuthPage = (props) => {
     // props.setAuthenticated(true);
     await Word.run(async (context) => {
       Office.context.ui.displayDialogAsync(
-        "https://alpha.lvh.me:3000/login.html",
+        "https://gamma-dev.pramata.com/addin/login.html",
         { height: 60, width: 20 },
         (asyncResult) => {
           const dialog = asyncResult.value;
@@ -44,7 +44,7 @@ const AuthPage = (props) => {
             } else {
               // Redirect to App.jsx after dialog is closed
               props.setAuthenticated(true);
-              window.location.href = "https://alpha.lvh.me:3000/taskpane.html";
+              window.location.href = "https://gamma-dev.pramata.com/addin/taskpane.html";
             }
           });
         }
