@@ -58,10 +58,10 @@ const App = (props) => {
         title={props.title}
         message=""
       />
-        {/* <Accordion title="Replace/Find">
+         <Accordion title="General Actions">
           <div>
             <h5>
-              Replace or find its a straight forward functionality, here we want to display that we can acheive it via
+              All are straight forward functionalities, here we want to display that we can acheive it via
               the add in.
             </h5>
             <Accordion title="Replace">
@@ -70,34 +70,35 @@ const App = (props) => {
             <Accordion title="Find">
               <FindComponent/>
             </Accordion>
+            <Accordion title="Insert">
+              <div>
+                <h5>Inserting any text/paragraph can be in 3 different modes start, end and in middle.</h5>
+                <Insert/>
+              </div>
+            </Accordion>
+            <Accordion title="Comment">
+              <div>
+                <h5>Comment can be added to a selection of text even by matching string/text or a paragraph. </h5>
+              </div>
+              <div>
+                <Comment/>
+              </div>
+            </Accordion>
+            <Accordion title="Accept/Reject">
+              <div>
+                <h5>User have option to confirming the red lined changes. Once it comfirmed it will be added to the original document.</h5>
+              </div>
+              <div>
+                <ApprovalComponent/>
+              </div>
+            </Accordion>
+            <Accordion title="Original/Current">
+              <div><h5>The word document can Exported at the end. Have option to export with or without red lined changes.</h5></div>
+              <div><TextExport/></div>
+            </Accordion>
           </div>
         </Accordion>
-        <Accordion title="Insert">
-          <div>
-            <h5>Inserting any text/paragraph can be in 3 different modes start, end and in middle.</h5>
-            <Insert/>
-          </div>
-        </Accordion>
-        <Accordion title="Comment">
-          <div>
-            <h5>Comment can be added to a selection of text even by matching string/text or a paragraph. </h5>
-          </div>
-          <div>
-            <Comment/>
-          </div>
-        </Accordion>
-        <Accordion title="Accept/Reject">
-          <div>
-            <h5>User have option to confirming the red lined changes. Once it comfirmed it will be added to the original document.</h5>
-          </div>
-          <div>
-            <ApprovalComponent/>
-          </div>
-        </Accordion>
-        <Accordion title="Original/Current">
-          <div><h5>The word document can Exported at the end. Have option to export with or without red lined changes.</h5></div>
-          <div><TextExport/></div>
-        </Accordion> */}
+        
         {/* <Accordion title="Chat with GenAI">
           <div><h5>The word document can Exported at the end. Have option to export with or without red lined changes.</h5></div>
           <div><TextChat/></div>
@@ -108,11 +109,11 @@ const App = (props) => {
         <Accordion title="GenAI">
           <GenAi/>
         </Accordion>
-        <Accordion title="Adhoc">
-          <Chat/>
-        </Accordion>
         <Accordion title="Standard Prompts">
           <KeyProvision/>
+        </Accordion>
+        <Accordion title="Standard Prompts with Playbook">
+          <Chat/>
         </Accordion>
         {/* <Accordion title="Gamma">
           <Gamma/>
