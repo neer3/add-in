@@ -103,18 +103,21 @@ const App = (props) => {
           <div><h5>The word document can Exported at the end. Have option to export with or without red lined changes.</h5></div>
           <div><TextChat/></div>
         </Accordion> */}
-        <Accordion title="Version Control">
+        {/* <Accordion title="Version Control">
           <SaveFile/>
-        </Accordion>
+        </Accordion> */}
         <Accordion title="GenAI">
-          <GenAi/>
-        </Accordion>
-        <Accordion title="Standard Prompts">
+          {/* <GenAi/> */}
+          <Accordion title="Standard Prompts">
+          <div><h5>Use Standard Prompt to get key provision from word document</h5></div>
           <KeyProvision/>
+          </Accordion>
+          <Accordion title="Standard Prompts with Playbook">
+          <div><h5>Try different playbooks to get suggestion and enhance the content with "Replace" option</h5></div>
+            <Chat/>
+          </Accordion>
         </Accordion>
-        <Accordion title="Standard Prompts with Playbook">
-          <Chat/>
-        </Accordion>
+        
         {/* <Accordion title="Gamma">
           <Gamma/>
         </Accordion> */}

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Form } from "semantic-ui-react";
+import { Form, Button } from "semantic-ui-react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { PramataSetting } from "./Token";
@@ -589,9 +589,9 @@ class KeyProvision extends Component {
 
         <div className="new-chat">
           <div className="quick-actins">{this.renderPrompts(standardPrompts)}</div>
-          <button onClick={this.handleSendMessage}>All Key Provisions</button>
+          <Button onClick={this.handleSendMessage}>All Key Provisions</Button>
           <br />
-          <button onClick={this.handleSendMessage2}>Limited Key Provisions</button>
+          <Button onClick={this.handleSendMessage2}>Limited Key Provisions</Button>
         </div>
       </div>
     );
