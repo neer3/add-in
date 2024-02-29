@@ -31,27 +31,22 @@ const App = (props) => {
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    // const cookies = document.cookie;
-    let valid_user=false;
-    // TODO
     fetch(`https://gamma-dev.pramata.com/api/auth/token?allow_unpublished=true`, {
       method: "GET",
       credentials: "include",
     })
-      .then((resp) => {
-        if (resp.status === 200) {
-          valid_user=true;
-        }
-      })
-      
-    // const jwtToken = cookies.split(";").find((cookie) => cookie.trim().startsWith("voyager_container_session_id="));
-    if (valid_user) {
-      setAuthenticated(true);
-    } else {
+    .then((resp) => {
+      if (resp.status === 200) {
+        setAuthenticated(true);
+      } else {
+        setAuthenticated(false);
+        console.log("Authentication failed!");
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching authentication token:", error);
       setAuthenticated(false);
-      console.log("Authentication failed!");
-    }
-   
+    });
   }, []);
 
   return (

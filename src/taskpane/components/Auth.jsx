@@ -8,25 +8,22 @@ const AuthPage = (props) => {
     // document.cookie = `voyager_container_session_id=${arg.message}; SameSite=None; Secure; expires=${new Date(Date.now() + 86400e3).toUTCString()}; path=/`;
     
     // const cookies = document.cookie;
-    let valid_user=false;
-    // TODO
     fetch(`https://gamma-dev.pramata.com/api/auth/token?allow_unpublished=true`, {
       method: "GET",
       credentials: "include",
     })
-      .then((resp) => {
-        if (resp.status === 200) {
-          valid_user=true;
-        }
-      })
-      
-    // const jwtToken = cookies.split(";").find((cookie) => cookie.trim().startsWith("voyager_container_session_id="));
-    if (valid_user) {
-      props.setAuthenticated(true);
-    } else {
-      props.setAuthenticated(false);
-      console.log("Authentication failed!");
-    }
+    .then((resp) => {
+      if (resp.status === 200) {
+        props.setAuthenticated(true);
+      } else {
+        props.setAuthenticated(false);
+        console.log("Authentication failed!");
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching authentication token:", error);
+      setAuthenticated(false);
+    });
     
   };
 
