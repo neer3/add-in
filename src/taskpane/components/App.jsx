@@ -46,9 +46,9 @@ const App = (props) => {
       
     // const jwtToken = cookies.split(";").find((cookie) => cookie.trim().startsWith("voyager_container_session_id="));
     if (valid_user) {
-      props.setAuthenticated(true);
+      setAuthenticated(true);
     } else {
-      props.setAuthenticated(false);
+      setAuthenticated(false);
       console.log("Authentication failed!");
     }
    
