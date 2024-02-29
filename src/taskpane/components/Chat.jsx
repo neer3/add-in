@@ -116,9 +116,18 @@ class Chat extends Component {
 
           var messagesCopy2 = this.state.messages;
           messagesCopy2[messagesCopy2.length - 1] = messagesCompCopy;
-          this.setState((prevState) => ({
-            messages: messagesCopy2,
-          }));
+          debugger
+          if (messagesCompCopy.length==0){
+            var messagesCopy = this.state.messages;
+            messagesCopy[messagesCopy.length - 1] = event.data;
+            this.setState((prevState) => ({
+              messages: messagesCopy,
+            }));
+          } else{
+            this.setState((prevState) => ({
+              messages: messagesCopy2,
+            }));
+          }
         } else if (temp.message.type === "stop" && this.state.playBookId == '2') {
           var regex = /```json([\s\S]*?)```/g;
           var match;
@@ -165,7 +174,18 @@ class Chat extends Component {
         
           var messagesCopy2 = [...this.state.messages];
           messagesCopy2[messagesCopy2.length - 1] = messagesCompCopy;
-          this.setState({ messages: messagesCopy2 });
+          debugger
+          if (messagesCompCopy.length==0){
+            var messagesCopy = this.state.messages;
+            messagesCopy[messagesCopy.length - 1] = event.data;
+            this.setState((prevState) => ({
+              messages: messagesCopy,
+            }));
+          } else{
+            this.setState((prevState) => ({
+              messages: messagesCopy2,
+            }));
+          }
         } else {
           var messagesCopy = this.state.messages;
 
