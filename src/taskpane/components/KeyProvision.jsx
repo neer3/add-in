@@ -338,7 +338,7 @@ class KeyProvision extends Component {
           question_content: "",
           prompt_api_label: "AddInKeyProvisions",
           app_api_label: "AddInKeyProvisions",
-          mapping_id: 12, //here
+          mapping_id: 14, //here
           context: "ALL",
           conversation_id: this.guid,
           scrollToBottom: true,

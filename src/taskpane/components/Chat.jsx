@@ -427,7 +427,7 @@ class Chat extends Component {
     const { streamingData, messages } = this.state;
     const { reportsData, exportPayload } = this.props;
     let { conversationId } = this.state;
-    debugger;
+
     if (!streamingData) {
       // conversationId = conversationId || this.newConversationId();
       conversationId = this.guid;
@@ -723,6 +723,7 @@ class Chat extends Component {
           <option value="1">Customer Negotiation Playbook</option>
           <option value="2">Negotiation Playbook</option>
         </select>
+        {button}
       </div>
         <div className="body markdown-body" id="contract-chat">
           <div className="chat-list" id="chat-list">
@@ -735,7 +736,7 @@ class Chat extends Component {
           <Form className="chat-form" autoComplete="off">
             <Form.Field className="editor-field">
             
-            {button}
+            
               {/* <textarea
                 onChange={(e) => {
                   this.setState({ input: e.target.value });
