@@ -10,7 +10,7 @@ const AuthPage = (props) => {
     // const cookies = document.cookie;
     let valid_user=false;
     // TODO
-    fetch(`https://gamma-dev.pramata.com/gen-ai-api/auth/token?allow_unpublished=false`, {
+    fetch(`https://gamma-dev.pramata.com/api/auth/token?allow_unpublished=true`, {
       method: "GET",
       credentials: "include",
     })
