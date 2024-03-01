@@ -737,6 +737,11 @@ class Chat extends Component {
     return (
       <div className="chatbot-container">
         <div className="header">GenAI Assist</div>
+        <div className="body markdown-body" id="contract-chat">
+          <div className="chat-list" id="chat-list">
+            {this.renderConversation(messages)}
+          </div>
+        </div>
         <div>
         <select id="dropdown" value={playBookId} onChange={handleSelectChange}>
           <option value="">--Please choose an playbook--</option>
@@ -745,12 +750,6 @@ class Chat extends Component {
         </select>
         {button}
       </div>
-        <div className="body markdown-body" id="contract-chat">
-          <div className="chat-list" id="chat-list">
-            {this.renderConversation(messages)}
-          </div>
-        </div>
-
         <div className="new-chat">
           <div className="quick-actins">{this.renderPrompts(standardPrompts)}</div>
           <Form className="chat-form" autoComplete="off">
