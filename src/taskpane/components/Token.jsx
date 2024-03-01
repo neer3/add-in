@@ -27,4 +27,31 @@ export class PramataSetting {
 
     return jwtToken;
   }
+
+  static apiToken() {
+    let apiToken = null;
+
+    debugger;
+    fetch(`https://gamma-dev.pramata.com/api/gen-ai-api/auth/token?allow_unpublished=true`, {
+      method: "GET",
+      credentials: "include",
+    })
+      .then((resp) => {
+        debugger;
+        if (resp.status === 200) {
+          return resp.json();
+        }
+        throw resp;
+      })
+      .then((resp) => {
+        // this.setState({
+        //   requests: [],
+        //   streamingData: false,
+        // });
+        apiToken = resp["token"];
+      })
+      .catch();
+
+    return apiToken;
+  }
 }
